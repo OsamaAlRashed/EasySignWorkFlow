@@ -28,7 +28,10 @@ public class CashRequestStatusC : State<Guid, CashRequestStatus>
         new(CashRequestStatus.WaitingForCashierOfficerApproval);
 
     public static CashRequestStatusC WaitingForFinanceManagerApproval =
-        new(CashRequestStatus.WaitingForFinanceManagerApproval);
+        new(CashRequestStatus.WaitingForFinanceManagerApproval);  
+    
+    public static CashRequestStatusC Canceled =
+        new(CashRequestStatus.Canceled);
 
     public CashRequestStatusC(CashRequestStatus status) : base(status)
     {
