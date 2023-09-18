@@ -9,7 +9,11 @@ public abstract class Request<TKey, TStatus>
     [NotMapped]
     public virtual TStatus? CurrentStatus => _statuses
         .OrderByDescending(x => x.DateSigned)
-        .Select(x => x.Status).FirstOrDefault();
+        .Select(x => x.Status).FirstOrDefault();  
+    [NotMapped]
+    public virtual State<TKey, TStatus> CurrentStatus2 => _statuses
+        .OrderByDescending(x => x.DateSigned)
+        .First();
 
     [NotMapped]
     public virtual TStatus? PreviousStatus 

@@ -26,3 +26,5 @@ public enum CashRequestType
     Transfer = 3,
     Exchange = 4,
 }
+
+

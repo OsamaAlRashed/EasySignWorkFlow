@@ -5,7 +5,7 @@ namespace EasySignWorkFlow
     public class FlowMachine<TRequest, TKey, TStatus>
         where TKey : IEquatable<TKey>
         where TStatus : Enum
-        
+
     {
         public Dictionary<TStatus, Func<TRequest, TStatus>> Map { get; private set; }
 
@@ -34,12 +34,8 @@ namespace EasySignWorkFlow
             return this;
         }
 
-        public FlowMachine<TRequest, TKey, TStatus> SetNextIf(TStatus currentStatus,Func<TRequest, bool> predicate, TStatus trueSide, TStatus falseSide,Action<TRequest> action)
-        {
-            Map[currentStatus] = ConvertToFunc(predicate, trueSide, falseSide);
-            return this;
-        }
-             public FlowMachine<TRequest, TKey, TStatus> SetNextIf(TStatus currentStatus,Func<TRequest, bool> predicate, TStatus trueSide, TStatus falseSide,Action<TRequest> action)
+        public FlowMachine<TRequest, TKey, TStatus> SetNextIf(TStatus currentStatus, Func<TRequest, bool> predicate,
+            TStatus trueSide, TStatus falseSide, Action<TRequest> action)
         {
             Map[currentStatus] = ConvertToFunc(predicate, trueSide, falseSide);
             return this;
@@ -48,29 +44,30 @@ namespace EasySignWorkFlow
 
         static Func<TRequest, TStatus> ConvertToFunc<TRequest, TStatus>(
             Func<TRequest, bool> predicate, TStatus trueSide, TStatus falseSide)
-            {
-                return request => predicate(request) ? trueSide : falseSide;
-            }
+        {
+            return request => predicate(request) ? trueSide : falseSide;
+        }
 
         static Func<TRequest, TStatus> ConvertToFunc<TRequest, TStatus>(
-            params (TStatus Status, Func<TRequest, bool> Predicate)[] pats)
+            params (TStatus Status, Func<TRequest, bool> Predicate)[] paths)
+        {
+            return request =>
             {
-                return request =>
+                foreach (var (status, predicate) in paths)
                 {
-                    foreach (var (status, predicate) in paths)
+                    if (predicate(request))
                     {
-                        if (predicate(request))
-                        {
-                            return status;
-                        }
+                        return status;
                     }
+                }
 
-                    throw new InvalidOperationException("No predicate matched.");
-                };
-            }
+                throw new InvalidOperationException("No predicate matched.");
+            };
+        }
 
 
-        public FlowMachine<TRequest, TKey, TStatus> SetNextIf(TStatus currentStatus, params (TStatus Status, Func<TRequest, bool> Predicate)[] paths)
+        public FlowMachine<TRequest, TKey, TStatus> SetNextIf(TStatus currentStatus,
+            params (TStatus Status, Func<TRequest, bool> Predicate)[] paths)
         {
             Map[currentStatus] = ConvertToFunc(paths);
             return this;
@@ -99,72 +96,144 @@ namespace EasySignWorkFlow
             _acceptedStatus = status;
             return this;
         }
-
     }
 }
 
-public class FlowMachine2<TRequest,TStatus,TTrigger>
-    where TStatus : Enum
-    {
-        public Dictionary<TStatus, MyState<TStatus,TTrigger,TRequest>[]> Map { get; private set; }
 
-        public FlowMachine2<TRequest,TStatus,TTrigger> Config(TStatus currentStatus,Func<TRequest, bool> predicate,Func<TTrigger> trueSide,Action<TRequest>? trueSideAction = null)    
-        {
-            var a = Map[currentStatus];
-            
-            return this;
-        }
-
-        public TTrigger Fire(TRequest request,Func<TRequest,TStatus> current)
-        {
-                var currnetStat =  current(request);
-               
-                foreach (var check in Map[currnetStat])
-                {
-                    if(check.Go(request) is {} a){
-                        return a;
-                    }
-                };
-                throw new Exception("end");
-                
-        }
-    }
-
-public class MyState<TStatus,TTrigger,TRequest>
+public class FlowMachine2<TRequest, TStatus> where TStatus : notnull
 {
-    private Func<TRequest, bool> predicate;
-        
-    private Func<TTrigger> trueSide;
-    
-    private   Action<TRequest>? trueSideAction;
+    public Dictionary<TStatus, List<MyState<TRequest, TStatus>>> Map { get; private set; }
 
-    public MyState(Func<TRequest, bool> predicate)
+    private Func<TRequest, TStatus, TStatus, Task> _onTransaction;
+
+    private FlowMachine2()
     {
-        this.predicate = predicate;
+        Map = new Dictionary<TStatus, List<MyState<TRequest, TStatus>>>();
     }
 
-    public MyState<TStatus,TTrigger,TRequest> TriggerCreation(Func<TTrigger> trigger)
+    private FlowMachine2(IEqualityComparer<TStatus> equalityComparer)
     {
-        trueSide = trigger;
+        Map = new Dictionary<TStatus, List<MyState<TRequest, TStatus>>>(equalityComparer);
+    }
+
+    public static FlowMachine2<TRequest, TStatus> Create()
+    {
+        return new();
+    }    
+    public static FlowMachine2<TRequest, TStatus> Create(IEqualityComparer<TStatus> equalityComparer)
+    {
+        return new(equalityComparer);
+    }
+
+    public FlowMachine2<TRequest, TStatus> SetTransaction(Action<TRequest, TStatus, TStatus> action)
+    {
+        _onTransaction = (request, current, next) =>
+        {
+            action(request, current, next);
+            return Task.CompletedTask;
+        };
         return this;
     }
-    
-    public MyState<TStatus,TTrigger,TRequest> WhatDo(Action<TRequest> action)
+
+    public FlowMachine2<TRequest, TStatus> SetTransactionAsync(Func<TRequest, TStatus, TStatus, Task> action)
     {
-        trueSideAction = action;
+        _onTransaction = action;
         return this;
     }
 
-     public TTrigger? Go(TRequest request){
-        if(predicate(request)){
-            if(trueSideAction is not null)
-                trueSideAction(request);
-            return trueSide();
+    public MyState<TRequest, TStatus> When(TStatus currentStatus)
+    {
+        var stat = new MyState<TRequest, TStatus>(currentStatus);
+        if (Map.TryGetValue(currentStatus, out var a))
+        {
+            a.Add(stat);
         }
 
-        return default;
-     }
- 
-            
+        return stat;
+    }
+
+    public async ValueTask<bool> FireAsync(TRequest request, Func<TRequest, TStatus> current)
+    {
+        return await FireAsync(request, current(request));
+    }
+
+    public async ValueTask<bool> FireAsync(TRequest request, TStatus current)
+    {
+        foreach (var state in Map[current])
+        {
+            if (await state.Can(request))
+            {
+                await _onTransaction(request, current, state.Next);
+                await state.DoOnSetAsync(request, current);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool Fire(TRequest request, Func<TRequest, TStatus> current)
+    {
+        return FireAsync(request, current).GetAwaiter().GetResult();
+    }
+
+    public bool Fire(TRequest request, TStatus current)
+    {
+        return FireAsync(request, current).GetAwaiter().GetResult();
+    }
 }
-        
+
+public class MyState<TRequest, TStatus>
+{
+    private Func<TRequest, Task<bool>> _predicate;
+
+    public TStatus Next { get; private set; }
+
+    private Func<TRequest, TStatus, TStatus, Task>? _onSetAsync;
+
+    public MyState(TStatus current)
+    {
+    }
+
+    public MyState<TRequest, TStatus> If(Func<TRequest, bool> predicate)
+    {
+        this._predicate = request => Task.FromResult(predicate(request));
+        return this;
+    }
+    public MyState<TRequest, TStatus> IfAsync(Func<TRequest, Task<bool>> predicate)
+    {
+        this._predicate = predicate;
+        return this;
+    }
+
+    public MyState<TRequest, TStatus> Set(TStatus next, Action<TRequest, TStatus, TStatus>? action = null)
+    {
+        Next = next;
+        return this;
+    }
+
+    public MyState<TRequest, TStatus> OnSet(Action<TRequest, TStatus, TStatus> action)
+    {
+        _onSetAsync = (request, status, arg3) =>
+        {
+            action(request, status, arg3);
+            return Task.CompletedTask;
+        };
+        return this;
+    }
+
+    public MyState<TRequest, TStatus> OnSetAsync(Func<TRequest, TStatus, TStatus, Task> action)
+    {
+        _onSetAsync = action;
+        return this;
+    }
+
+    internal async ValueTask<bool> Can(TRequest request)
+    {
+        return await _predicate(request);
+    }
+
+    internal async Task DoOnSetAsync(TRequest request, TStatus current) =>
+        await _onSetAsync?.Invoke(request, current, Next)!;
+}

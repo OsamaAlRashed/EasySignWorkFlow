@@ -16,7 +16,7 @@ namespace Demo.Controllers
         [HttpPut]
         public async Task<IActionResult> Approve(Guid id)
         {
-            await _cashRequestService.Approve(id, "wow!");
+            await _cashRequestService.Handel(id, "wow!");
 
             return Ok();
         }
