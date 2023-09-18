@@ -25,8 +25,8 @@ public  class State<TKey, TStatus>
     public string? Note { get;private set; }
     public bool IsSigned => DateSigned.HasValue;
 
-    public void SetSignedBy(TKey signedBy) => SignedBy = signedBy;
-    public void SetNote(string note) => Note = note;
+    
+    public State<TKey, TStatus> New(TKey signedBy, string note) => new(Status, DateTime.Now, signedBy, note);
     public override bool Equals(object? obj)
     {
         
