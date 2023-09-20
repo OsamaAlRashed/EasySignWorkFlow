@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Demo.Migrations
 {
     [DbContext(typeof(DemoDBContext))]
-    [Migration("20230906173228_Test")]
-    partial class Test
+    [Migration("20230920191358_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,9 +30,20 @@ namespace Demo.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CenterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DirId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RequestType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectorId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -50,6 +61,23 @@ namespace Demo.Migrations
                     b.ToTable("Leaves");
                 });
 
+            modelBuilder.Entity("Demo.Models.TestRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Flag")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TestRequests");
+                });
+
             modelBuilder.Entity("Demo.Models.CashRequest", b =>
                 {
                     b.OwnsMany("CashRequestStatus", "Statuses", b1 =>
@@ -62,6 +90,12 @@ namespace Demo.Migrations
                                 .HasColumnType("int");
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
+
+                            b1.Property<string>("Note")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("SignedBy")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.HasKey("CashRequestId", "Id");
 
@@ -87,12 +121,48 @@ namespace Demo.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
 
+                            b1.Property<string>("Note")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("SignedBy")
+                                .HasColumnType("uniqueidentifier");
+
                             b1.HasKey("LeaveId", "Id");
 
                             b1.ToTable("LeaveStatus");
 
                             b1.WithOwner()
                                 .HasForeignKey("LeaveId");
+                        });
+
+                    b.Navigation("Statuses");
+                });
+
+            modelBuilder.Entity("Demo.Models.TestRequest", b =>
+                {
+                    b.OwnsMany("TestRequestStatus", "Statuses", b1 =>
+                        {
+                            b1.Property<Guid>("TestRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
+
+                            b1.Property<string>("Note")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("SignedBy")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("TestRequestId", "Id");
+
+                            b1.ToTable("TestRequestStatus");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TestRequestId");
                         });
 
                     b.Navigation("Statuses");

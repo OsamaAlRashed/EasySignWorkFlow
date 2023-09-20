@@ -1,8 +1,9 @@
 ﻿using Demo.Enums;
 using Demo.Models;
 using Demo.Models.DBContext;
-using EasySignWorkFlow.Models;
-using Microsoft.EntityFrameworkCore;
+using EasySignWorkFlow;
+
+namespace Demo.Services;
 
 public class FlowMachineFactory
 {
@@ -13,36 +14,29 @@ public class FlowMachineFactory
         _context = context;
     }
 
-
-    public FlowMachine2<State<Guid, CashRequestStatus>> BuildCashRequest(CashRequest request,
-        Guid signedBy,
-        string note)
+    public FlowMachine<CashRequest, Guid, CashRequestStatus> BuildCashRequest()
     {
-        var flowMachine2 = FlowMachine2<State<Guid, CashRequestStatus>>
-            .Create(request.CurrentStatus2, CashRequestStatusCEqualityComparer.Instance);
+        var flowMachine = new FlowMachine<CashRequest, Guid, CashRequestStatus>(CashRequestStatus.Draft);
 
-        flowMachine2.OnTransition((current, next) => { request.AddState(next.New(signedBy, note)); });
-
-        flowMachine2.When(CashRequestStatusC.Draft)
-            .If(() => request.RequestType == CashRequestType.Exchange)
-            .Set(CashRequestStatusC.Draft)
-            .OnExecuteAsync(async (current, next) =>
+        flowMachine.When(CashRequestStatus.Draft)
+            .Set(CashRequestStatus.WaitingForFinanceAccountantApproval)
+            .SetResponsible((_, _) => Enumerable.Range(0, 10).Select(x => Guid.NewGuid()))
+            .OnExecute((request, current, next) =>
             {
-                Console.WriteLine($"{request.Id} : {current.Status} to {next.Status}");
-                await _context.CashRequests.FirstOrDefaultAsync();
+                Console.WriteLine($"{request.Id} : {current} to {next}");
             });
 
-        flowMachine2.When(CashRequestStatusC.Draft)
-            .If(() => request.RequestType == CashRequestType.Payment)
-            .Set(CashRequestStatusC.WaitingForFinanceAccountantApproval)
-            .OnExecute((current, next) => Console.WriteLine($"{request.Id} : {current.Status} to {next.Status}"));    
-        
-        
-        flowMachine2.When(CashRequestStatusC.Draft)
-            .If(() => request.RequestType == CashRequestType.Payment)
-            .Set(CashRequestStatusC.WaitingForFinanceManagerApproval)
-            .OnExecute((current, next) => Console.WriteLine($"{request.Id} : {current.Status} to {next.Status}"));
+        flowMachine.When(CashRequestStatus.WaitingForFinanceAccountantApproval)
+            .Set(CashRequestStatus.WaitingForCashierOfficerApproval);
 
-        return flowMachine2;
+        flowMachine.When(CashRequestStatus.WaitingForCashierOfficerApproval)
+            .Set(CashRequestStatus.WaitingForCashierOfficerApproval)
+            .SetResponsible((_, _) => Enumerable.Range(0, 10).Select(x => Guid.NewGuid()))
+            .OnExecute((request, current, next) =>
+            {
+                Console.WriteLine($"{request.Id} : {current} to {next}");
+            });
+
+        return flowMachine;
     }
 }

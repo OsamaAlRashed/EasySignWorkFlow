@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Demo.Controllers
+namespace Demo.Controllers;
+
+[Route("[controller]")]
+public class CashRequestController : ControllerBase
 {
-    [Route("[controller]")]
-    public class CashRequestController : ControllerBase
-    {
-    }
+
 }

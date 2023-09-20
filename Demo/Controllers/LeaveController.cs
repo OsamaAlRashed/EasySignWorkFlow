@@ -1,24 +1,22 @@
 ﻿using Demo.Services;
+using EasySignWorkFlow.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Demo.Controllers
+namespace Demo.Controllers;
+
+[Route("[controller]")]
+public class LeaveController : ControllerBase
 {
-    [Route("[controller]")]
-    public class LeaveController : ControllerBase
+    private readonly CashRequestService _cashRequestService;
+
+    public LeaveController(CashRequestService cashRequestService)
     {
-        private readonly CashRequestService _cashRequestService;
+        _cashRequestService = cashRequestService;
+    }
 
-        public LeaveController(CashRequestService cashRequestService)
-        {
-            _cashRequestService = cashRequestService;
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Approve(Guid id)
-        {
-            await _cashRequestService.Approve(id, "wow!");
-
-            return Ok();
-        }
+    [HttpPut]
+    public async Task<IActionResult> Approve(Guid id)
+    {
+        return Ok();
     }
 }

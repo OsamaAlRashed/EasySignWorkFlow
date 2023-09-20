@@ -1,12 +1,25 @@
 ﻿using EasySignWorkFlow;
 using EasySignWorkFlow.Models;
+using System.Net.NetworkInformation;
 
 namespace EasySignWorkFlow.Extensions;
 
 public static class RequestExtensions
 {
+    public static void OnCreate<TRequest, TKey, TStatus>(
+        this TRequest request,
+        FlowMachine<TRequest, TKey, TStatus> flowMachine,
+        TKey? signedBy = default)
+        
+        where TKey : IEquatable<TKey>
+        where TStatus : Enum
+        where TRequest : Request<TKey, TStatus>
+    {
+        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, DateTime.Now, signedBy, ""));
+    }
+
     public static bool Approve<TRequest, TKey, TStatus>(this TRequest request,
-        FlowMachine<TRequest, TKey, TStatus> flowMachine, Action<TRequest> action = null)
+        FlowMachine<TRequest, TKey, TStatus> flowMachine, Action<TRequest>? action = null)
         where TKey : IEquatable<TKey>
         where TStatus : Enum
         where TRequest : Request<TKey, TStatus>
@@ -25,31 +38,18 @@ public static class RequestExtensions
         where TStatus : Enum
         where TRequest : Request<TKey, TStatus>
     {
-        if (request.CurrentStatus == null)
+        if (request.CurrentStatus is null)
             throw new ArgumentNullException(nameof(request), "No states yet.");
 
-        var func = flowMachine.Map[request.CurrentStatus];
-        var nextStatus = func(request);
+        flowMachine.SetTransaction((request, current, next) => request.AddState(new State<TKey, TStatus>(next, DateTime.Now, signedBy, note)));
 
-        request.AddState(new State<TKey, TStatus>(nextStatus, DateTime.Now, signedBy, note));
         action(request);
 
-        return true;
-    }
+        var result = flowMachine.Fire(request, request.CurrentStatus);
+        if (result)
+            action(request);
 
-    public static bool Approve2<TRequest, TStatusEnum,TStatus, TKey>(this TRequest request,
-        FlowMachine2<TRequest, TStatus> flowMachine, TKey signedBy, string note)
-        where TKey : IEquatable<TKey>
-        where TStatusEnum : Enum
-        where TRequest : Request<TKey, TStatusEnum>
-        
-    {
-        if (request.CurrentStatus == null)
-            throw new ArgumentNullException(nameof(request), "No states yet.");
-
-        // flowMachine.Fire(request,() => request.CurrentStatus2);
-        //
-        return true;
+        return result;
     }
 
     public static bool Reject<TRequest, TKey, TStatus>(this TRequest request,

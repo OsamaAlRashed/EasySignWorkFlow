@@ -10,8 +10,9 @@ public abstract class Request<TKey, TStatus>
     public virtual TStatus? CurrentStatus => _statuses
         .OrderByDescending(x => x.DateSigned)
         .Select(x => x.Status).FirstOrDefault();  
+    
     [NotMapped]
-    public virtual State<TKey, TStatus> CurrentStatus2 => _statuses
+    public virtual State<TKey, TStatus> CurrentState => _statuses
         .OrderByDescending(x => x.DateSigned)
         .First();
 
@@ -29,12 +30,12 @@ public abstract class Request<TKey, TStatus>
         .OrderByDescending(x => x.DateSigned)
         .Select(x => x.SignedBy).FirstOrDefault();
 
-
     private readonly List<State<TKey, TStatus>> _statuses = new();
 
+    [NotMapped]
     public IReadOnlyList<State<TKey, TStatus>> Statuses => _statuses.AsReadOnly();
 
-    public void AddState(State<TKey, TStatus> state) => _statuses.Add(state);
+    internal void AddState(State<TKey, TStatus> state) => _statuses.Add(state);
 
-    public void Reset() => _statuses.Clear();
+    internal void Reset() => _statuses.Clear();
 }
