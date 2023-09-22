@@ -3,6 +3,7 @@
 namespace EasySignWorkFlow.Models;
 
 public sealed class State<TKey, TStatus>
+    where TKey : IEquatable<TKey>
     where TStatus : Enum
 {
     private State() { }
@@ -33,16 +34,14 @@ public sealed class State<TKey, TStatus>
 
     public override bool Equals(object? obj)
     {
-        if (obj is  State<TKey, TStatus> other)
+        if (obj is State<TKey, TStatus> other)
         {
             return other.Status.Equals(Status);    
         }
 
         return false;
     }
-    
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Status);
-    }
+
+    public override int GetHashCode() 
+        => HashCode.Combine(Status);
 }

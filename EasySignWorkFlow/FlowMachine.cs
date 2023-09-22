@@ -7,24 +7,36 @@ public class FlowMachine<TRequest, TKey, TStatus>
     where TStatus : Enum
     where TKey : IEquatable<TKey>
 {
-    public Dictionary<TStatus, List<MyState<TRequest, TKey, TStatus>>> Map { get; private set; }
+    public Dictionary<TStatus, List<Transaction<TRequest, TKey, TStatus>>> Map { get; private set; }
 
     private Func<TRequest, TStatus, TStatus, Task>? _onTransaction;
 
-    internal TStatus? RefuseStatus { get; }
-    internal TStatus? CancelStatus { get; }
-    internal TStatus InitStatus { get; }
+    internal TStatus? RefuseStatus { get; private set; }
+    internal TStatus? CancelStatus { get; private set; }
+    internal TStatus InitStatus { get; private set; }
 
-    public FlowMachine(TStatus initStatus, TStatus? refuseStatus = default,TStatus? cancelStatus = default)
+    public FlowMachine(TStatus initStatus)
     {
-        InitStatus= initStatus;
-        CancelStatus = cancelStatus;
-        RefuseStatus = refuseStatus;
+        InitStatus = initStatus;
 
-        Map = new Dictionary<TStatus, List<MyState<TRequest, TKey, TStatus>>>
+        Map = new Dictionary<TStatus, List<Transaction<TRequest, TKey, TStatus>>>
         {
-            { initStatus, new List<MyState<TRequest, TKey, TStatus>>() }
+            { initStatus, new List<Transaction<TRequest, TKey, TStatus>>() }
         };
+    }
+
+    public FlowMachine<TRequest, TKey, TStatus> SetCancelState(TStatus status)
+    {
+        CancelStatus = status;
+
+        return this;
+    }
+
+    public FlowMachine<TRequest, TKey, TStatus> SetRefuseState(TStatus status)
+    {
+        RefuseStatus = status;
+
+        return this;
     }
 
     public FlowMachine<TRequest, TKey, TStatus> SetTransaction(Action<TRequest, TStatus, TStatus> action)
@@ -44,47 +56,42 @@ public class FlowMachine<TRequest, TKey, TStatus>
         return this;
     }
 
-    public MyState<TRequest, TKey, TStatus> When(TStatus currentStatus)
+    public Transaction<TRequest, TKey, TStatus> When(TStatus currentStatus)
     {
-        var myState = new MyState<TRequest, TKey, TStatus>();
+        var transaction = new Transaction<TRequest, TKey, TStatus>();
 
         if (!Map.ContainsKey(currentStatus))
         {
             Map[currentStatus] = new();
         }
 
-        return myState;
+        return transaction;
     }
 
-    public async ValueTask<bool> FireAsync(TRequest request, Func<TRequest, TStatus> current)
-    {
-        return await FireAsync(request, current(request));
-    }
+    
 
     public async ValueTask<bool> FireAsync(TRequest request, TStatus current)
     {
-        foreach (var state in Map[current])
+        foreach (var transaction in Map[current])
         {
-            if (await state.Can(request))
+            if (await transaction.ValidAsync(request))
             {
-                await _onTransaction(request, current, state.Next);
-                await state.DoOnSetAsync(request, current);
+                await _onTransaction!(request, current, transaction.Next);
+                await transaction.ExecuteAsync(request, current);
 
                 return true;
             }
-
         }
 
         return false;
     }
 
-    public bool Fire(TRequest request, Func<TRequest, TStatus> current)
-    {
-        return FireAsync(request, current).GetAwaiter().GetResult();
-    }
+    public async ValueTask<bool> FireAsync(TRequest request, Func<TRequest, TStatus> current)
+        => await FireAsync(request, current(request));
 
-    public bool Fire(TRequest request, TStatus current)
-    {
-        return FireAsync(request, current).GetAwaiter().GetResult();
-    }
+    public bool Fire(TRequest request, Func<TRequest, TStatus> current) 
+        => FireAsync(request, current).AsTask().GetAwaiter().GetResult();
+
+    public bool Fire(TRequest request, TStatus current) 
+        => FireAsync(request, current).AsTask().GetAwaiter().GetResult();
 }
