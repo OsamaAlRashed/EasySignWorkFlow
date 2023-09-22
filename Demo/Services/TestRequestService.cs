@@ -19,19 +19,19 @@ namespace Demo.Services
             _flowMachine = new FlowMachine<TestRequest, Guid, TestStatus>(TestStatus.Draft);
 
             _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
-            
+
             _flowMachine.When(TestStatus.Draft)
                 .Set(TestStatus.WaitingForManager)
                 .OnExecute((request, current, next) =>
                 {
-                    Console.WriteLine($"{request.Id} : {current} to {next}");
+                    Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
 
             _flowMachine.When(TestStatus.WaitingForManager)
                 .Set(TestStatus.Accepted)
                 .OnExecute((request, current, next) =>
                 {
-                    Console.WriteLine($"{request.Id} : {current} to {next}");
+                    Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
         }
 
@@ -68,9 +68,9 @@ namespace Demo.Services
         {
             var request = await _context.TestRequests.FindAsync(id);
 
-            var result = request!.Approve(_flowMachine, signedBy, note, (request) =>
+            var result = request.Approve(_flowMachine, signedBy, note, (request) =>
             {
-                request.Title = request.Title + " " + request.CurrentStatus;
+                request.Flag = !request.Flag;
             });
 
             await _context.SaveChangesAsync();
@@ -78,13 +78,14 @@ namespace Demo.Services
             return result;
         }
 
+
         public async Task<bool> Refuse(Guid id, Guid signedBy, string note)
         {
             var request = await _context.TestRequests.FindAsync(id);
 
             var result = request!.Refuse(_flowMachine, signedBy, note, (request) =>
             {
-                request.Title = request.Title + " " + request.CurrentStatus;
+                request.Title = request.Title + " (Refused)";
             });
 
             await _context.SaveChangesAsync();

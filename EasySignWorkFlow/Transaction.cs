@@ -84,9 +84,19 @@ public class Transaction<TRequest, TKey, TStatus>
     internal async ValueTask<bool> ValidAsync(TRequest request) 
         => await _predicate(request);
 
-    internal async Task ExecuteAsync(TRequest request, TStatus current) 
-        => await _onExecuteAsync?.Invoke(request, current, Next)!;
+    internal async Task ExecuteAsync(TRequest request, TStatus current)
+    {
+        if(_onExecuteAsync is null)
+            return;
 
-    internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current) 
-        => await _nextUsersGetter?.Invoke(request, current)!;
+        await _onExecuteAsync.Invoke(request, current, Next)!;
+    }
+        
+    internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current)
+    {
+        if(_nextUsersGetter is null)
+            return Enumerable.Empty<TKey>();
+
+        return await _nextUsersGetter.Invoke(request, current)!;
+    }
 }

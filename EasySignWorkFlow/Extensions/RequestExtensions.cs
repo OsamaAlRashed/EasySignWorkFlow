@@ -16,7 +16,7 @@ public static class RequestExtensions
     {
         if (request.Statuses.Any())
         {
-            throw new Exception("");
+            throw new Exception("Request already has an initial status.");
         }
 
         request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, DateTime.Now, signedBy, string.Empty));
