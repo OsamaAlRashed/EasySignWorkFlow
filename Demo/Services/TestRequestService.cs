@@ -16,28 +16,38 @@ namespace Demo.Services
         {
             _context = context;
 
-            _flowMachine = new FlowMachine<TestRequest, Guid, TestStatus>(
-                TestStatus.Draft,
-                TestStatus.Refused,
-                TestStatus.Canceled);
+            _flowMachine = new FlowMachine<TestRequest, Guid, TestStatus>(TestStatus.Draft);
 
+            _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
+            
             _flowMachine.When(TestStatus.Draft)
                 .Set(TestStatus.WaitingForManager)
-                .OnExecute((request, status, next) =>
+                .OnExecute((request, current, next) =>
                 {
-                    Console.WriteLine($"move {request.Title} from {status} to {status}.");
+                    Console.WriteLine($"{request.Id} : {current} to {next}");
                 });
 
             _flowMachine.When(TestStatus.WaitingForManager)
-                .Set(TestStatus.Accepted);
+                .Set(TestStatus.Accepted)
+                .OnExecute((request, current, next) =>
+                {
+                    Console.WriteLine($"{request.Id} : {current} to {next}");
+                });
         }
 
-        public async Task<List<TestRequest>> Get()
+        public async Task<List<TestRequest>> Get() => await _context.TestRequests.ToListAsync();
+
+        public async Task<TestRequest?> Get(Guid id) => await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+        
+        public async Task Clear()
         {
-            return await _context.TestRequests.ToListAsync();
+            var requests = await Get();
+            _context.TestRequests.RemoveRange(requests);
+
+            await _context.SaveChangesAsync();
         }
 
-        public async Task Add()
+        public async Task<Guid> Add()
         {
             var request = new TestRequest()
             {
@@ -50,6 +60,8 @@ namespace Demo.Services
             _context.TestRequests.Add(request);
 
             await _context.SaveChangesAsync();
+
+            return request.Id;
         }
 
         public async Task<bool> Approve(Guid id, Guid signedBy, string note)
@@ -57,6 +69,48 @@ namespace Demo.Services
             var request = await _context.TestRequests.FindAsync(id);
 
             var result = request!.Approve(_flowMachine, signedBy, note, (request) =>
+            {
+                request.Title = request.Title + " " + request.CurrentStatus;
+            });
+
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<bool> Refuse(Guid id, Guid signedBy, string note)
+        {
+            var request = await _context.TestRequests.FindAsync(id);
+
+            var result = request!.Refuse(_flowMachine, signedBy, note, (request) =>
+            {
+                request.Title = request.Title + " " + request.CurrentStatus;
+            });
+
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<bool> Reset(Guid id, Guid signedBy, string note)
+        {
+            var request = await _context.TestRequests.FindAsync(id);
+
+            var result = request!.Reset(_flowMachine, signedBy, note, (request) =>
+            {
+                request.Title = request.Title + " - " + request.CurrentStatus;
+            });
+
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<bool> Cancel(Guid id, Guid signedBy, string note)
+        {
+            var request = await _context.TestRequests.FindAsync(id);
+
+            var result = request!.Cancel(_flowMachine, signedBy, note, (request) =>
             {
                 request.Title = request.Title + " " + request.CurrentStatus;
             });

@@ -58,7 +58,7 @@ public class FlowMachine<TRequest, TKey, TStatus>
 
     public Transaction<TRequest, TKey, TStatus> When(TStatus currentStatus)
     {
-        var transaction = new Transaction<TRequest, TKey, TStatus>();
+        var transaction = new Transaction<TRequest, TKey, TStatus>(this, currentStatus);
 
         if (!Map.ContainsKey(currentStatus))
         {
@@ -67,8 +67,6 @@ public class FlowMachine<TRequest, TKey, TStatus>
 
         return transaction;
     }
-
-    
 
     public async ValueTask<bool> FireAsync(TRequest request, TStatus current)
     {

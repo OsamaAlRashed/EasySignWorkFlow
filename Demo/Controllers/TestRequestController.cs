@@ -1,4 +1,5 @@
 ﻿using Demo.Services;
+using EasySignWorkFlow.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demo.Controllers;
@@ -14,21 +15,30 @@ public class TestRequestController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add()
-    {
-        await _testRequestService.Add();
-        return Ok();
-    }
+    public async Task<IActionResult> Add() => Ok(await _testRequestService.Add());
 
     [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        return Ok(await _testRequestService.Get());
-    }
+    public async Task<IActionResult> Get() => Ok(await _testRequestService.Get());
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get(Guid id) => Ok(await _testRequestService.Get(id));
 
     [HttpPut]
-    public async Task<IActionResult> Approve(Guid id)
+    public async Task<IActionResult> Approve(Guid id) => Ok(await _testRequestService.Approve(id, Guid.NewGuid(), "wow!"));
+
+    [HttpPut]
+    public async Task<IActionResult> Refuse(Guid id) => Ok(await _testRequestService.Refuse(id, Guid.NewGuid(), "wow!"));
+
+    [HttpPut]
+    public async Task<IActionResult> Cancel(Guid id) => Ok(await _testRequestService.Cancel(id, Guid.NewGuid(), "wow!"));
+
+    [HttpPut]
+    public async Task<IActionResult> Reset(Guid id) => Ok(await _testRequestService.Reset(id, Guid.NewGuid(), "wow!"));
+
+    [HttpDelete]
+    public async Task<IActionResult> Clear()
     {
-        return Ok(await _testRequestService.Approve(id, Guid.NewGuid(), "wow!"));
+        await _testRequestService.Clear();
+        return Ok();
     }
 }

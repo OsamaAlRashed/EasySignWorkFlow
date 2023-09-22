@@ -1,13 +1,28 @@
-﻿namespace EasySignWorkFlow;
+﻿using EasySignWorkFlow.Models;
+
+namespace EasySignWorkFlow;
 
 public class Transaction<TRequest, TKey, TStatus>
     where TKey : IEquatable<TKey>
+    where TStatus : Enum
+    where TRequest : Request<TKey, TStatus>
 {
+
+    public Transaction(FlowMachine<TRequest, TKey, TStatus> flow, TStatus current)
+    {
+        _flow = flow;
+        _current = current;
+    }
+
     private Func<TRequest, Task<bool>> _predicate = (_) => Task.FromResult(true);
 
     private Func<TRequest, TStatus, TStatus, Task>? _onExecuteAsync;
 
     private Func<TRequest, TStatus, Task<IEnumerable<TKey>>>? _nextUsersGetter;
+
+    private readonly FlowMachine<TRequest, TKey, TStatus> _flow;
+    
+    private readonly TStatus _current;
     
     public TStatus Next { get; private set; }
 
@@ -26,6 +41,9 @@ public class Transaction<TRequest, TKey, TStatus>
     public Transaction<TRequest, TKey, TStatus> Set(TStatus next)
     {
         Next = next;
+
+        _flow.Map[_current].Add(this);
+
         return this;
     }
 
