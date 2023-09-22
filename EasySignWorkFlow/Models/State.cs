@@ -23,7 +23,7 @@ public sealed class State<TKey, TStatus>
     public TStatus Status { get; private set; }
     public DateTime? DateSigned { get; private set; }
     public TKey? SignedBy { get; private set; }
-    public string? Note { get;private set; }
+    public string? Note { get; private set; }
 
     [NotMapped]
     public bool IsSigned => DateSigned.HasValue;
@@ -33,14 +33,12 @@ public sealed class State<TKey, TStatus>
 
     public override bool Equals(object? obj)
     {
-        
         if (obj is  State<TKey, TStatus> other)
         {
             return other.Status.Equals(Status);    
         }
 
         return false;
-
     }
     
     public override int GetHashCode()
