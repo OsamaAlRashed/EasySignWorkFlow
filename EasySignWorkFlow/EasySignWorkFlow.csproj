@@ -4,6 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>EasySignWorkFlow</Title>
+    <Authors>Osama Al-Rashed</Authors>
+    <Version>1.0.0-beta</Version>
+    <PackageProjectUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
