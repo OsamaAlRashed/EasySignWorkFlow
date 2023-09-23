@@ -7,7 +7,7 @@ namespace EasySignWorkFlow.Extensions;
 
 public static class CancelRequestExtensions
 {
-    public static ActionResult<TStatus> Cancel<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Cancel<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         Action<TRequest>? action = default)
@@ -16,7 +16,7 @@ public static class CancelRequestExtensions
     where TRequest : Request<TKey, TStatus>
         => request.Cancel(flowMachine, default, action);
 
-    public static ActionResult<TStatus> Cancel<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Cancel<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey signedBy,
@@ -26,7 +26,7 @@ public static class CancelRequestExtensions
     where TRequest : Request<TKey, TStatus>
         => request.Cancel(flowMachine, signedBy, string.Empty, action);
 
-    public static ActionResult<TStatus> Cancel<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Cancel<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey signedBy,
@@ -46,20 +46,22 @@ public static class CancelRequestExtensions
             request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
             request.CurrentStatus.Value.IsFinalStatus(flowMachine))
         {
-            return ActionResult<TStatus>.SetFailed(
+            return Result<TStatus>.SetFailed(
                 ActionType.Cancel,
                 request.CurrentStatus,
                 request.CurrentStatus,
                 "Can not cancel the request if the current status is refused, canceled, or it is in final status");
         }
 
+        TStatus current = request.CurrentStatus.Value;
+
         request.AddState(new State<TKey, TStatus>(flowMachine.CancelStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note));
         if (action is not null)
             action(request);
 
-        return ActionResult<TStatus>.SetSuccess(
+        return Result<TStatus>.SetSuccess(
             ActionType.Cancel,
-            request.CurrentStatus,
+            current,
             flowMachine.CancelStatus);
     }
 }

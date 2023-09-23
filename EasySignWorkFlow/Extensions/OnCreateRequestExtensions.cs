@@ -7,7 +7,7 @@ namespace EasySignWorkFlow.Extensions;
 
 public static class OnCreateRequestExtensions
 {
-    public static ActionResult<TStatus> OnCreate<TRequest, TKey, TStatus>(
+    public static Result<TStatus> OnCreate<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey? signedBy = default,
@@ -22,9 +22,9 @@ public static class OnCreateRequestExtensions
 
         request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
 
-        return ActionResult<TStatus>.SetSuccess(
+        return Result<TStatus>.SetSuccess(
             ActionType.OnCreate,
-            request.CurrentStatus,
+            flowMachine.InitStatus,
             request.CurrentStatus);
     }
 }

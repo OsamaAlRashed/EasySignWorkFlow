@@ -2,10 +2,10 @@
 
 namespace EasySignWorkFlow.Commons;
 
-public sealed class ActionResult<TStatus>
+public sealed class Result<TStatus>
     where TStatus : struct, Enum
 {
-    public ActionResult(
+    public Result(
         ActionType actionType,
         TStatus? previousStatus,
         TStatus? newStatus,
@@ -26,14 +26,14 @@ public sealed class ActionResult<TStatus>
     public string? Message { get; private set; }
 
 
-    internal static ActionResult<TStatus> SetSuccess(ActionType actionType, TStatus? previousStatus, TStatus? newStatus)
+    internal static Result<TStatus> SetSuccess(ActionType actionType, TStatus? previousStatus, TStatus? newStatus)
         => new(actionType, previousStatus, newStatus, true, string.Empty);
 
-    internal static ActionResult<TStatus> SetFailed(ActionType actionType, TStatus? previousStatus, TStatus? newStatus, string message)
+    internal static Result<TStatus> SetFailed(ActionType actionType, TStatus? previousStatus, TStatus? newStatus, string message)
         => new(actionType, previousStatus, newStatus, false, message);
 
-    public static bool operator true(ActionResult<TStatus> actionResult) => actionResult.IsSucceeded;
-    public static bool operator false(ActionResult<TStatus> actionResult) => !actionResult.IsSucceeded;
+    public static bool operator true(Result<TStatus> actionResult) => actionResult.IsSucceeded;
+    public static bool operator false(Result<TStatus> actionResult) => !actionResult.IsSucceeded;
 
-    public static implicit operator bool(ActionResult<TStatus> actionResult) => actionResult.IsSucceeded;
+    public static implicit operator bool(Result<TStatus> actionResult) => actionResult.IsSucceeded;
 }

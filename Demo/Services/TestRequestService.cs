@@ -108,7 +108,7 @@ namespace Demo.Services
 
             var result = request.Refuse(_flowMachine, signedBy, note, (request) =>
             {
-                request.Title = request.Title + " (Refused)";
+                request.Title += " (Refused)";
             });
 
             await _context.SaveChangesAsync();

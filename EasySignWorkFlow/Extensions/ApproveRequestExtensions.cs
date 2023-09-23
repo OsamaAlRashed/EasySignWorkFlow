@@ -7,7 +7,7 @@ namespace EasySignWorkFlow.Extensions;
 
 public static class ApproveRequestExtensions
 {
-    public static ActionResult<TStatus> Approve<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Approve<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         Action<TRequest>? action = default)
@@ -16,7 +16,7 @@ public static class ApproveRequestExtensions
     where TRequest : Request<TKey, TStatus>
         => request.Approve(flowMachine, default, action);
 
-    public static ActionResult<TStatus> Approve<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Approve<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey signedBy,
@@ -26,7 +26,7 @@ public static class ApproveRequestExtensions
     where TRequest : Request<TKey, TStatus>
         => request.Approve(flowMachine, signedBy, string.Empty, action);
 
-    public static ActionResult<TStatus> Approve<TRequest, TKey, TStatus>(
+    public static Result<TStatus> Approve<TRequest, TKey, TStatus>(
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey signedBy,
@@ -43,14 +43,15 @@ public static class ApproveRequestExtensions
             request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
             request.CurrentStatus.Value.IsFinalStatus(flowMachine))
         {
-            return ActionResult<TStatus>.SetFailed(
+            return Result<TStatus>.SetFailed(
                 ActionType.Approve,
                 request.CurrentStatus,
                 request.CurrentStatus,
                 "Can not approve the request if the current status is refused, cancel, or it is in final status");
         }
 
-        TStatus? nextStatus = request.CurrentStatus;
+        TStatus current = request.CurrentStatus.Value;
+        TStatus? nextStatus = null;
 
         flowMachine.SetTransition((request, current, next) => 
         {
@@ -62,9 +63,9 @@ public static class ApproveRequestExtensions
         if (result && action is not null)
             action(request);
 
-        return ActionResult<TStatus>.SetSuccess(
+        return Result<TStatus>.SetSuccess(
             ActionType.Approve,
-            request.CurrentStatus,
+            current,
             nextStatus);
     }
 }
