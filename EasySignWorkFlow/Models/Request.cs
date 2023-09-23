@@ -11,14 +11,17 @@ public abstract class Request<TKey, TStatus>
     public IReadOnlyList<State<TKey, TStatus>> Statuses => _statuses.AsReadOnly();
 
     [NotMapped]
-    public virtual TStatus? CurrentStatus => _statuses
-        .OrderByDescending(x => x.DateSigned)
-        .Select(x => x.Status).FirstOrDefault();  
+    public virtual TStatus? CurrentStatus =>
+        _statuses.Any() ?
+        _statuses.OrderByDescending(x => x.DateSigned)
+        .Select(x => x.Status).FirstOrDefault() :
+        null;  
     
     [NotMapped]
-    public virtual State<TKey, TStatus> CurrentState => _statuses
+    public virtual State<TKey, TStatus>? CurrentState 
+        => _statuses.Any() ? _statuses
         .OrderByDescending(x => x.DateSigned)
-        .First();
+        .First() : null;
 
     [NotMapped]
     public virtual TStatus? PreviousStatus 

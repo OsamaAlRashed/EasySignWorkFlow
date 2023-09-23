@@ -24,6 +24,12 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
         {
             { initStatus, new List<Transition<TRequest, TKey, TStatus>>() }
         };
+
+        _onTransaction = (request, current, next) =>
+        {
+            request.AddState(new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty));
+            return Task.CompletedTask;
+        };
     }
 
     public FlowMachine<TRequest, TKey, TStatus> SetCancelState(TStatus status)

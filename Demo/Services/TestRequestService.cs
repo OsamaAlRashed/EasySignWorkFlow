@@ -98,7 +98,6 @@ namespace Demo.Services
             return result;
         }
 
-
         public async Task<bool> Refuse(Guid id, Guid signedBy, string note)
         {
             var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
