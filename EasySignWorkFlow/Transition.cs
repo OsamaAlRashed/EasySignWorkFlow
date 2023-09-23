@@ -2,18 +2,11 @@
 
 namespace EasySignWorkFlow;
 
-public class Transaction<TRequest, TKey, TStatus>
+public class Transition<TRequest, TKey, TStatus>
     where TKey : IEquatable<TKey>
     where TStatus : Enum
     where TRequest : Request<TKey, TStatus>
 {
-
-    public Transaction(FlowMachine<TRequest, TKey, TStatus> flow, TStatus current)
-    {
-        _flow = flow;
-        _current = current;
-    }
-
     private Func<TRequest, Task<bool>> _predicate = (_) => Task.FromResult(true);
 
     private Func<TRequest, TStatus, TStatus, Task>? _onExecuteAsync;
@@ -21,24 +14,30 @@ public class Transaction<TRequest, TKey, TStatus>
     private Func<TRequest, TStatus, Task<IEnumerable<TKey>>>? _nextUsersGetter;
 
     private readonly FlowMachine<TRequest, TKey, TStatus> _flow;
-    
-    private readonly TStatus _current;
-    
-    public TStatus Next { get; private set; }
 
-    public Transaction<TRequest, TKey, TStatus> If(Func<TRequest, bool> predicate)
+    private readonly TStatus _current;
+
+    public Transition(FlowMachine<TRequest, TKey, TStatus> flow, TStatus current)
+    {
+        _flow = flow;
+        _current = current;
+    }
+    
+    public TStatus? Next { get; private set; }
+
+    public Transition<TRequest, TKey, TStatus> If(Func<TRequest, bool> predicate)
     {
         _predicate = request => Task.FromResult(predicate(request));
         return this;
     }
     
-    public Transaction<TRequest, TKey, TStatus> IfAsync(Func<TRequest, Task<bool>> predicate)
+    public Transition<TRequest, TKey, TStatus> IfAsync(Func<TRequest, Task<bool>> predicate)
     {
         _predicate = predicate;
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> Set(TStatus next)
+    public Transition<TRequest, TKey, TStatus> Set(TStatus next)
     {
         Next = next;
 
@@ -47,7 +46,7 @@ public class Transaction<TRequest, TKey, TStatus>
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> OnExecute(Action<TRequest, TStatus, TStatus> action)
+    public Transition<TRequest, TKey, TStatus> OnExecute(Action<TRequest, TStatus, TStatus> action)
     {
         _onExecuteAsync = (request, status, nextStatus) =>
         {
@@ -58,20 +57,20 @@ public class Transaction<TRequest, TKey, TStatus>
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> OnExecuteAsync(Func<TRequest, TStatus, TStatus, Task> action)
+    public Transition<TRequest, TKey, TStatus> OnExecuteAsync(Func<TRequest, TStatus, TStatus, Task> action)
     {
         _onExecuteAsync = action;
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> SetNextUsersAsync(Func<TRequest, TStatus, Task<IEnumerable<TKey>>> func)
+    public Transition<TRequest, TKey, TStatus> SetNextUsersAsync(Func<TRequest, TStatus, Task<IEnumerable<TKey>>> func)
     {
         _nextUsersGetter = func;
 
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> SetNextUsers(Func<TRequest, TStatus, IEnumerable<TKey>> func)
+    public Transition<TRequest, TKey, TStatus> SetNextUsers(Func<TRequest, TStatus, IEnumerable<TKey>> func)
     {
         _nextUsersGetter = (request, status) =>
         {

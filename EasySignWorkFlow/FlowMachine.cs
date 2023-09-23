@@ -7,7 +7,7 @@ public class FlowMachine<TRequest, TKey, TStatus>
     where TStatus : Enum
     where TKey : IEquatable<TKey>
 {
-    public Dictionary<TStatus, List<Transaction<TRequest, TKey, TStatus>>> Map { get; private set; }
+    public Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>> Map { get; private set; }
 
     private Func<TRequest, TStatus, TStatus, Task>? _onTransaction;
 
@@ -19,9 +19,9 @@ public class FlowMachine<TRequest, TKey, TStatus>
     {
         InitStatus = initStatus;
 
-        Map = new Dictionary<TStatus, List<Transaction<TRequest, TKey, TStatus>>>
+        Map = new Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>>
         {
-            { initStatus, new List<Transaction<TRequest, TKey, TStatus>>() }
+            { initStatus, new List<Transition<TRequest, TKey, TStatus>>() }
         };
     }
 
@@ -39,7 +39,7 @@ public class FlowMachine<TRequest, TKey, TStatus>
         return this;
     }
 
-    public FlowMachine<TRequest, TKey, TStatus> SetTransaction(Action<TRequest, TStatus, TStatus> action)
+    public FlowMachine<TRequest, TKey, TStatus> SetTransition(Action<TRequest, TStatus, TStatus> action)
     {
         _onTransaction = (request, current, next) =>
         {
@@ -50,15 +50,15 @@ public class FlowMachine<TRequest, TKey, TStatus>
         return this;
     }
 
-    public FlowMachine<TRequest, TKey, TStatus> SetTransactionAsync(Func<TRequest, TStatus, TStatus, Task> action)
+    public FlowMachine<TRequest, TKey, TStatus> SetTransitionAsync(Func<TRequest, TStatus, TStatus, Task> action)
     {
         _onTransaction = action;
         return this;
     }
 
-    public Transaction<TRequest, TKey, TStatus> When(TStatus currentStatus)
+    public Transition<TRequest, TKey, TStatus> When(TStatus currentStatus)
     {
-        var transaction = new Transaction<TRequest, TKey, TStatus>(this, currentStatus);
+        var transaction = new Transition<TRequest, TKey, TStatus>(this, currentStatus);
 
         if (!Map.ContainsKey(currentStatus))
         {

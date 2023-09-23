@@ -211,7 +211,7 @@ public static class RequestExtensions
         if (request.CurrentStatus is null)
             throw new ArgumentNullException(nameof(request), "No states yet.");
 
-        flowMachine.SetTransaction((request, current, next) => request.AddState(new State<TKey, TStatus>(next, DateTime.Now, signedBy, note)));
+        flowMachine.SetTransition((request, current, next) => request.AddState(new State<TKey, TStatus>(next, DateTime.Now, signedBy, note)));
 
         var result = flowMachine.Fire(request, request.CurrentStatus);
         if (result && action is not null)
