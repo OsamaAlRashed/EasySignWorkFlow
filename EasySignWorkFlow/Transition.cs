@@ -2,7 +2,7 @@
 
 namespace EasySignWorkFlow;
 
-public class Transition<TRequest, TKey, TStatus>
+public sealed class Transition<TRequest, TKey, TStatus>
     where TKey : IEquatable<TKey>
     where TStatus : Enum
     where TRequest : Request<TKey, TStatus>

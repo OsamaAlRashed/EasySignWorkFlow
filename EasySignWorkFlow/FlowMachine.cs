@@ -3,7 +3,7 @@ using EasySignWorkFlow.Models;
 
 namespace EasySignWorkFlow;
 
-public class FlowMachine<TRequest, TKey, TStatus> 
+public sealed class FlowMachine<TRequest, TKey, TStatus> 
     where TRequest : Request<TKey, TStatus>
     where TStatus : Enum
     where TKey : IEquatable<TKey>
