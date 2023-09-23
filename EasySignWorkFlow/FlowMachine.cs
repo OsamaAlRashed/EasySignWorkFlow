@@ -1,11 +1,12 @@
 ﻿using EasySignWorkFlow.Enums;
 using EasySignWorkFlow.Models;
+using System.Transactions;
 
 namespace EasySignWorkFlow;
 
 public sealed class FlowMachine<TRequest, TKey, TStatus> 
     where TRequest : Request<TKey, TStatus>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TKey : IEquatable<TKey>
 {
     public Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>> Map { get; private set; }
@@ -88,9 +89,14 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
     {
         foreach (var transaction in Map[current])
         {
+            if (!transaction.Next.HasValue)
+            {
+                continue;
+            }
+
             if (await transaction.ValidAsync(request))
             {
-                await _onTransaction!(request, current, transaction.Next);
+                await _onTransaction!(request, current, transaction.Next.Value);
                 await transaction.ExecuteAsync(request, current);
 
                 return true;

@@ -4,7 +4,7 @@ namespace EasySignWorkFlow.Models;
 
 public abstract class Request<TKey, TStatus>
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
 {
     private readonly List<State<TKey, TStatus>> _statuses = new();
 
@@ -22,7 +22,7 @@ public abstract class Request<TKey, TStatus>
 
     [NotMapped]
     public virtual TStatus? PreviousStatus 
-        => Statuses.Count > 1 ? Statuses[^2].Status : default;
+        => Statuses.Count > 1 ? Statuses[^2].Status : null;
 
     [NotMapped]
     public virtual DateTime? LastSignDate => Statuses

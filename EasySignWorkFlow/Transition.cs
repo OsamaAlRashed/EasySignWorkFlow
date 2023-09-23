@@ -4,7 +4,7 @@ namespace EasySignWorkFlow;
 
 public sealed class Transition<TRequest, TKey, TStatus>
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
 {
     private Func<TRequest, Task<bool>> _predicate = (_) => Task.FromResult(true);
@@ -85,10 +85,10 @@ public sealed class Transition<TRequest, TKey, TStatus>
 
     internal async Task ExecuteAsync(TRequest request, TStatus current)
     {
-        if(_onExecuteAsync is null)
+        if(_onExecuteAsync is null || !Next.HasValue)
             return;
 
-        await _onExecuteAsync.Invoke(request, current, Next)!;
+        await _onExecuteAsync.Invoke(request, current, Next.Value)!;
     }
         
     internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current)

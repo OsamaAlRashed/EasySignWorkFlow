@@ -9,7 +9,7 @@ public static class GetNextUsersRequestExtensions
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => GetNextUsersAsync(request, flowMachine).GetAwaiter().GetResult();
 
@@ -17,17 +17,17 @@ public static class GetNextUsersRequestExtensions
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (request.CurrentStatus is null)
+        if (!request.CurrentStatus.HasValue)
             throw new CurrentStatusNullException();
 
-        foreach (var transaction in flowMachine.Map[request.CurrentStatus])
+        foreach (var transaction in flowMachine.Map[request.CurrentStatus.Value])
         {
             if (await transaction.ValidAsync(request))
             {
-                return await transaction.GetNextUserAsync(request, request.CurrentStatus);
+                return await transaction.GetNextUserAsync(request, request.CurrentStatus.Value);
             }
         }
 

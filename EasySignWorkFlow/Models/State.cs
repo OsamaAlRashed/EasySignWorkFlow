@@ -4,7 +4,7 @@ namespace EasySignWorkFlow.Models;
 
 public sealed class State<TKey, TStatus>
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
 {
     private State() { }
 

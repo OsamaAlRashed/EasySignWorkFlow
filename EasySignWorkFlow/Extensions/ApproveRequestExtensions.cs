@@ -12,9 +12,9 @@ public static class ApproveRequestExtensions
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
-        => request!.Approve(flowMachine, default, action);
+        => request.Approve(flowMachine, default, action);
 
     public static ActionResult<TStatus> Approve<TRequest, TKey, TStatus>(
         this TRequest request,
@@ -22,7 +22,7 @@ public static class ApproveRequestExtensions
         TKey signedBy,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => request.Approve(flowMachine, signedBy, string.Empty, action);
 
@@ -33,15 +33,15 @@ public static class ApproveRequestExtensions
         string note,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (request.CurrentStatus is null)
+        if (!request.CurrentStatus.HasValue)
             throw new CurrentStatusNullException();
 
-        if (request.CurrentStatus.IsRefuseStatus(flowMachine) ||
-            request.CurrentStatus.IsCancelStatus(flowMachine) ||
-            request.CurrentStatus.IsFinalStatus(flowMachine))
+        if (request.CurrentStatus.Value.IsRefuseStatus(flowMachine) ||
+            request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
+            request.CurrentStatus.Value.IsFinalStatus(flowMachine))
         {
             return ActionResult<TStatus>.SetFailed(
                 ActionType.Approve,
@@ -58,7 +58,7 @@ public static class ApproveRequestExtensions
             request.AddState(new State<TKey, TStatus>(next, flowMachine.GetCurrentDateTime(), signedBy, note));
         });
 
-        var result = flowMachine.Fire(request, request.CurrentStatus);
+        var result = flowMachine.Fire(request, request.CurrentStatus.Value);
         if (result && action is not null)
             action(request);
 

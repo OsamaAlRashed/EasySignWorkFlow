@@ -12,7 +12,7 @@ public static class ResetRequestExtensions
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => request.Reset(flowMachine, default, action);
 
@@ -22,7 +22,7 @@ public static class ResetRequestExtensions
         TKey signedBy,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => request.Reset(flowMachine, signedBy, string.Empty, action);
 
@@ -33,13 +33,13 @@ public static class ResetRequestExtensions
         string note,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (request.CurrentStatus is null)
+        if (!request.CurrentStatus.HasValue)
             throw new CurrentStatusNullException();
 
-        if (!request.CurrentStatus.IsRefuseStatus(flowMachine))
+        if (!request.CurrentStatus.Value.IsRefuseStatus(flowMachine))
         {
             return ActionResult<TStatus>.SetFailed(
                 ActionType.Reset,

@@ -3,6 +3,7 @@
 namespace EasySignWorkFlow.Commons;
 
 public sealed class ActionResult<TStatus>
+    where TStatus : struct, Enum
 {
     public ActionType ActionType { get; private set; }
     public TStatus? PreviousStatus { get; private set; }

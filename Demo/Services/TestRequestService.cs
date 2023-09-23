@@ -9,14 +9,13 @@ namespace Demo.Services
 {
     public class TestRequestService
     {
-        private readonly FlowMachine<TestRequest, Guid, TestStatus> _flowMachine;
+        private readonly FlowMachine<TestRequest, Guid, TestStatus> _flowMachine 
+            = new(TestStatus.Draft);
         private readonly DemoDBContext _context;
 
         public TestRequestService(DemoDBContext context)
         {
             _context = context;
-
-            _flowMachine = new FlowMachine<TestRequest, Guid, TestStatus>(TestStatus.Draft);
 
             _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
 
@@ -84,7 +83,10 @@ namespace Demo.Services
 
         public async Task<bool> Approve(Guid id, Guid signedBy, string note)
         {
-            var request = await _context.TestRequests.FindAsync(id);
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(request == null)
+                return false;
 
             var result = request.Approve(_flowMachine, signedBy, note, (request) =>
             {
@@ -99,9 +101,12 @@ namespace Demo.Services
 
         public async Task<bool> Refuse(Guid id, Guid signedBy, string note)
         {
-            var request = await _context.TestRequests.FindAsync(id);
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+            
+            if (request == null)
+                return false;
 
-            var result = request!.Refuse(_flowMachine, signedBy, note, (request) =>
+            var result = request.Refuse(_flowMachine, signedBy, note, (request) =>
             {
                 request.Title = request.Title + " (Refused)";
             });
@@ -113,9 +118,12 @@ namespace Demo.Services
 
         public async Task<bool> Reset(Guid id, Guid signedBy, string note)
         {
-            var request = await _context.TestRequests.FindAsync(id);
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
 
-            var result = request!.Reset(_flowMachine, signedBy, note, (request) =>
+            if (request == null)
+                return false;
+
+            var result = request.Reset(_flowMachine, signedBy, note, (request) =>
             {
                 request.Title = request.Title + " - " + request.CurrentStatus;
             });
@@ -127,9 +135,12 @@ namespace Demo.Services
 
         public async Task<bool> Cancel(Guid id, Guid signedBy, string note)
         {
-            var request = await _context.TestRequests.FindAsync(id);
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
 
-            var result = request!.Cancel(_flowMachine, signedBy, note, (request) =>
+            if (request == null)
+                return false;
+
+            var result = request.Cancel(_flowMachine, signedBy, note, (request) =>
             {
                 request.Title = request.Title + " " + request.CurrentStatus;
             });

@@ -14,7 +14,7 @@ public static class OnCreateRequestExtensions
         string note = "")
 
         where TKey : IEquatable<TKey>
-        where TStatus : Enum
+        where TStatus : struct, Enum
         where TRequest : Request<TKey, TStatus>
     {
         if (request.Statuses.Any())

@@ -12,7 +12,7 @@ public static class CancelRequestExtensions
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => request.Cancel(flowMachine, default, action);
 
@@ -22,7 +22,7 @@ public static class CancelRequestExtensions
         TKey signedBy,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
         => request.Cancel(flowMachine, signedBy, string.Empty, action);
 
@@ -33,18 +33,18 @@ public static class CancelRequestExtensions
         string note,
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
-    where TStatus : Enum
+    where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (request.CurrentStatus is null)
+        if (!request.CurrentStatus.HasValue)
             throw new CurrentStatusNullException();
 
-        if(flowMachine.CancelStatus is null)
+        if (!flowMachine.CancelStatus.HasValue)
             throw new CancelNotSetException();
 
-        if (request.CurrentStatus.IsRefuseStatus(flowMachine) ||
-            request.CurrentStatus.IsCancelStatus(flowMachine) ||
-            request.CurrentStatus.IsFinalStatus(flowMachine))
+        if (request.CurrentStatus.Value.IsRefuseStatus(flowMachine) ||
+            request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
+            request.CurrentStatus.Value.IsFinalStatus(flowMachine))
         {
             return ActionResult<TStatus>.SetFailed(
                 ActionType.Cancel,
@@ -53,7 +53,7 @@ public static class CancelRequestExtensions
                 "Can not cancel the request if the current status is refused, canceled, or it is in final status");
         }
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.CancelStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
+        request.AddState(new State<TKey, TStatus>(flowMachine.CancelStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note));
         if (action is not null)
             action(request);
 
