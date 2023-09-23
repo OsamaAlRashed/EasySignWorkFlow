@@ -3,7 +3,8 @@
 public enum TestStatus
 {
     Draft,
-    WaitingForManager,
+    WaitingForManager1,
+    WaitingForManager2,
     Accepted,
     Refused,
     Canceled,

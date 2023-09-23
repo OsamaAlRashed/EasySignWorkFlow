@@ -1,4 +1,5 @@
-﻿using EasySignWorkFlow.Models;
+﻿using EasySignWorkFlow.Enums;
+using EasySignWorkFlow.Models;
 
 namespace EasySignWorkFlow;
 
@@ -10,7 +11,7 @@ public class FlowMachine<TRequest, TKey, TStatus>
     public Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>> Map { get; private set; }
 
     private Func<TRequest, TStatus, TStatus, Task>? _onTransaction;
-
+    internal DateTimeProvider DateProvider { get; private set; }
     internal TStatus? RefuseStatus { get; private set; }
     internal TStatus? CancelStatus { get; private set; }
     internal TStatus InitStatus { get; private set; }
@@ -30,6 +31,21 @@ public class FlowMachine<TRequest, TKey, TStatus>
         CancelStatus = status;
 
         return this;
+    }
+
+    public FlowMachine<TRequest, TKey, TStatus> SetDateTimeProvider(DateTimeProvider dateProvider)
+    {
+        DateProvider = dateProvider;
+
+        return this;
+    }
+
+    internal DateTime GetCurrentDateTime()
+    {
+        if (DateProvider == DateTimeProvider.UtcNow)
+            return DateTime.UtcNow;
+
+        return DateTime.Now;
     }
 
     public FlowMachine<TRequest, TKey, TStatus> SetRefuseState(TStatus status)

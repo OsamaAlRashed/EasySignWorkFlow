@@ -21,13 +21,31 @@ namespace Demo.Services
             _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
 
             _flowMachine.When(TestStatus.Draft)
-                .Set(TestStatus.WaitingForManager)
+                .If(request => request.Flag)
+                .Set(TestStatus.WaitingForManager1)
                 .OnExecute((request, current, next) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
 
-            _flowMachine.When(TestStatus.WaitingForManager)
+            _flowMachine.When(TestStatus.Draft)
+                .If(request => !request.Flag)
+                .Set(TestStatus.WaitingForManager2)
+                .OnExecute((request, current, next) =>
+                {
+                    Console.WriteLine($"{request.Title} moved from {current} to {next}");
+                });
+
+            _flowMachine.When(TestStatus.WaitingForManager1)
+                .If(request => !request.Flag)
+                .Set(TestStatus.Accepted)
+                .OnExecute((request, current, next) =>
+                {
+                    Console.WriteLine($"{request.Title} moved from {current} to {next}");
+                });
+
+            _flowMachine.When(TestStatus.WaitingForManager2)
+                .If(request => !request.Flag)
                 .Set(TestStatus.Accepted)
                 .OnExecute((request, current, next) =>
                 {

@@ -1,5 +1,4 @@
 ﻿using EasySignWorkFlow.Models;
-using System.Net.NetworkInformation;
 
 namespace EasySignWorkFlow.Extensions;
 
@@ -19,7 +18,7 @@ public static class RequestExtensions
             throw new Exception("Request already has an initial status.");
         }
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, DateTime.Now, signedBy, string.Empty));
+        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, string.Empty));
     }
 
 
@@ -86,7 +85,7 @@ public static class RequestExtensions
             return false;
         }
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.RefuseStatus, DateTime.Now, signedBy, string.Empty));
+        request.AddState(new State<TKey, TStatus>(flowMachine.RefuseStatus, flowMachine.GetCurrentDateTime(), signedBy, string.Empty));
         if (action is not null)
             action(request);
 
@@ -120,7 +119,7 @@ public static class RequestExtensions
             return false;
         }
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, DateTime.Now, signedBy, string.Empty));
+        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, string.Empty));
         if (action is not null)
             action(request);
 
@@ -159,7 +158,7 @@ public static class RequestExtensions
             return false;
         }
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.CancelStatus, DateTime.Now, signedBy, string.Empty));
+        request.AddState(new State<TKey, TStatus>(flowMachine.CancelStatus, flowMachine.GetCurrentDateTime(), signedBy, string.Empty));
         if (action is not null)
             action(request);
 
@@ -211,7 +210,7 @@ public static class RequestExtensions
         if (request.CurrentStatus is null)
             throw new ArgumentNullException(nameof(request), "No states yet.");
 
-        flowMachine.SetTransition((request, current, next) => request.AddState(new State<TKey, TStatus>(next, DateTime.Now, signedBy, note)));
+        flowMachine.SetTransition((request, current, next) => request.AddState(new State<TKey, TStatus>(next, flowMachine.GetCurrentDateTime(), signedBy, note)));
 
         var result = flowMachine.Fire(request, request.CurrentStatus);
         if (result && action is not null)

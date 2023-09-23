@@ -1,6 +1,6 @@
 ﻿namespace EasySignWorkFlow.Enums;
 
-public enum DateProvider
+public enum DateTimeProvider
 {
     Now,
     UtcNow
