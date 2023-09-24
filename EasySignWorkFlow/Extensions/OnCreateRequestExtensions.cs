@@ -20,7 +20,7 @@ public static class OnCreateRequestExtensions
         if (request.Statuses.Any())
             throw new InitialStatusAlreadyExist();
 
-        request.AddState(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
+        request.Add(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
 
         return Result<TStatus>.SetSuccess(
             ActionType.OnCreate,

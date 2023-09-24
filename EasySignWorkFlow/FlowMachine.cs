@@ -26,7 +26,7 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
         _onTransaction = (request, current, next) =>
         {
-            request.AddState(new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty));
+            request.Add(new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty));
             return Task.CompletedTask;
         };
     }
@@ -50,14 +50,6 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
         DateProvider = dateProvider;
 
         return this;
-    }
-
-    internal DateTime GetCurrentDateTime()
-    {
-        if (DateProvider == DateTimeProvider.UtcNow)
-            return DateTime.UtcNow;
-
-        return DateTime.Now;
     }
 
     public FlowMachine<TRequest, TKey, TStatus> SetRefuseState(TStatus status)
@@ -125,4 +117,12 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
     public bool Fire(TRequest request, TStatus current) 
         => FireAsync(request, current).AsTask().GetAwaiter().GetResult();
+
+    internal DateTime GetCurrentDateTime()
+    {
+        if (DateProvider == DateTimeProvider.UtcNow)
+            return DateTime.UtcNow;
+
+        return DateTime.Now;
+    }
 }

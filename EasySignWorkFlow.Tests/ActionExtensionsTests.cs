@@ -43,6 +43,9 @@ public class ActionExtensionsTests
     public void Test2()
     {
         // Arrange
+        _flowMachine.When(MyRequestStatus.Draft)
+            .If(request => request.Value == 0)
+            .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
         _request.OnCreate(_flowMachine);

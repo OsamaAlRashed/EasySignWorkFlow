@@ -25,6 +25,10 @@ public abstract class Request<TKey, TStatus>
         => Statuses.Count > 1 ? Statuses[^2].Status : null;
 
     [NotMapped]
+    public virtual string? PreviousStatusName
+        => Statuses.Count > 1 ? Statuses[^2].Status.ToString() : null;
+
+    [NotMapped]
     public virtual DateTime? LastSignDate 
         => Statuses.OrderByDescending(x => x.DateSigned)
             .Select(x => x.DateSigned)
@@ -36,7 +40,7 @@ public abstract class Request<TKey, TStatus>
         .Select(x => x.SignedBy)
         .FirstOrDefault();
 
-    internal void AddState(State<TKey, TStatus> state) => _statuses.Add(state);
+    internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
 
     internal void Reset() => _statuses.Clear();
 }

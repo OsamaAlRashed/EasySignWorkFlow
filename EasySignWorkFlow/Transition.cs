@@ -7,23 +7,23 @@ public sealed class Transition<TRequest, TKey, TStatus>
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
 {
+    private readonly FlowMachine<TRequest, TKey, TStatus> _flow;
+    
     private Func<TRequest, Task<bool>> _predicate = (_) => Task.FromResult(true);
 
     private Func<TRequest, TStatus, TStatus, Task>? _onExecuteAsync;
 
     private Func<TRequest, TStatus, Task<IEnumerable<TKey>>>? _nextUsersGetter;
-
-    private readonly FlowMachine<TRequest, TKey, TStatus> _flow;
-
+    
     private readonly TStatus _current;
+
+    public TStatus? Next { get; private set; }
 
     public Transition(FlowMachine<TRequest, TKey, TStatus> flow, TStatus current)
     {
         _flow = flow;
         _current = current;
     }
-    
-    public TStatus? Next { get; private set; }
 
     public Transition<TRequest, TKey, TStatus> If(Func<TRequest, bool> predicate)
     {
