@@ -11,31 +11,30 @@ public abstract class Request<TKey, TStatus>
     public IReadOnlyList<State<TKey, TStatus>> Statuses => _statuses.AsReadOnly();
 
     [NotMapped]
-    public virtual TStatus? CurrentStatus =>
-        _statuses.Any() ?
-        _statuses.OrderByDescending(x => x.DateSigned)
-        .Select(x => x.Status).FirstOrDefault() :
-        null;  
-    
+    public virtual TStatus? CurrentStatus
+        => _statuses.OrderByDescending(x => x.DateSigned)
+            .FirstOrDefault()?.Status;
+
     [NotMapped]
     public virtual State<TKey, TStatus>? CurrentState 
-        => _statuses.Any() ? _statuses
-        .OrderByDescending(x => x.DateSigned)
-        .First() : null;
+        => _statuses.OrderByDescending(x => x.DateSigned)
+                .FirstOrDefault();
 
     [NotMapped]
     public virtual TStatus? PreviousStatus 
         => Statuses.Count > 1 ? Statuses[^2].Status : null;
 
     [NotMapped]
-    public virtual DateTime? LastSignDate => Statuses
-        .OrderByDescending(x => x.DateSigned)
-        .Select(x => x.DateSigned).FirstOrDefault();
+    public virtual DateTime? LastSignDate 
+        => Statuses.OrderByDescending(x => x.DateSigned)
+            .Select(x => x.DateSigned)
+            .FirstOrDefault();
 
     [NotMapped]
     public virtual TKey? LastSignBy => Statuses
         .OrderByDescending(x => x.DateSigned)
-        .Select(x => x.SignedBy).FirstOrDefault();
+        .Select(x => x.SignedBy)
+        .FirstOrDefault();
 
     internal void AddState(State<TKey, TStatus> state) => _statuses.Add(state);
 
