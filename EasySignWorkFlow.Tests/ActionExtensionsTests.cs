@@ -4,6 +4,7 @@ using Xunit;
 
 namespace EasySignWorkFlow.Tests;
 
+// Todo: rename the tests
 public class ActionExtensionsTests
 {
     private FlowMachine<MyRequest, Guid, MyRequestStatus> _flowMachine;
@@ -22,18 +23,32 @@ public class ActionExtensionsTests
     public void Test1()
     {
         // Arrange
+        _flowMachine.When(MyRequestStatus.Draft)
+            .If(request => request.Value == 0)
+            .Set(MyRequestStatus.WaitingForManager1);
+
+        _flowMachine.When(MyRequestStatus.Draft)
+            .If(request => request.Value != 0)
+            .Set(MyRequestStatus.WaitingForManager2);
 
         // Act
         _request.OnCreate(_flowMachine);
+        _request.Approve(_flowMachine);
 
         //Assert
-        Assert.False(_request.CurrentStatus is null);
-        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.True(_request.CurrentStatus == MyRequestStatus.WaitingForManager1);
     }
 
     [Fact]
     public void Test2()
     {
+        // Arrange
 
+        // Act
+        _request.OnCreate(_flowMachine);
+        _request.Approve(_flowMachine);
+
+        //Assert
+        Assert.True(_request.CurrentStatus == MyRequestStatus.WaitingForManager1);
     }
 }
