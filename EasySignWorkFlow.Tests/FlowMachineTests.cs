@@ -4,220 +4,188 @@ using Xunit;
 
 namespace EasySignWorkFlow.Tests;
 
+// Todo: rename the tests
 public class FlowMachineTests
 {
+    private FlowMachine<MyRequest, Guid, MyRequestStatus> _flowMachine;
+    private MyRequest _request;
+
+    public FlowMachineTests()
+    {
+        _request = new MyRequest();
+        _flowMachine = FlowMachine<MyRequest, Guid, MyRequestStatus>
+           .Create(MyRequestStatus.Draft);
+    }
+
     [Fact]
     public void Test1()
     {
         // Arrange
-        var request = new MyRequest();
 
         // Act
 
         //Assert
-        Assert.True(request.CurrentStatus is null);
+        Assert.True(_request.CurrentStatus is null);
     }
 
     [Fact]
     public void Test2()
     {
         // Arrange
-        var request = new MyRequest();
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-           = new(MyRequestStatus.Draft);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
         //Assert
-        Assert.False(request.CurrentStatus is null);
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.False(_request.CurrentStatus is null);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
     }
 
     [Fact]
     public void Test3()
     {
         // Arrange
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-           = new(MyRequestStatus.Draft);
-        var request = new MyRequest();
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
            .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
     }
 
     [Fact]
     public void Test4()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 0)
             .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
     }
 
     [Fact]
     public void Test5()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 1)
             .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.False(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
     }
 
     [Fact]
     public void Test6()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 0)
             .Set(MyRequestStatus.WaitingForManager1);
 
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value != 0)
             .Set(MyRequestStatus.WaitingForManager2);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         // Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-        Assert.False(request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
     }
 
     [Fact]
     public void Test7()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 1)
             .Set(MyRequestStatus.WaitingForManager1);
 
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 0)
             .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-        Assert.False(request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
     }
 
     [Fact]
     public void Test8()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 0)
             .Set(MyRequestStatus.WaitingForManager1);
 
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .If(request => request.Value == 1)
             .Set(MyRequestStatus.WaitingForManager1);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-        Assert.False(request.CurrentStatus!.Value == MyRequestStatus.Draft);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
     }
 
     [Fact]
     public void Test9()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .Set(MyRequestStatus.WaitingForManager1);
 
-        flowMachine.When(MyRequestStatus.WaitingForManager1)
+        _flowMachine.When(MyRequestStatus.WaitingForManager1)
             .Set(MyRequestStatus.Accepted);
 
         // Act
-        request.OnCreate(flowMachine);
+        _request.OnCreate(_flowMachine);
 
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         //Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.Accepted);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Accepted);
     }
 
     [Fact]
     public void Test10()
     {
         // Arrange
-        var request = new MyRequest();
-
-        FlowMachine<MyRequest, Guid, MyRequestStatus> flowMachine
-          = new(MyRequestStatus.Draft);
-
         MyRequestStatus? currentStatus = null;
         MyRequestStatus? nextStatus = null;
 
-        flowMachine.When(MyRequestStatus.Draft)
+        _flowMachine.When(MyRequestStatus.Draft)
             .Set(MyRequestStatus.WaitingForManager1)
             .OnExecute((request, current, next) =>
             {
@@ -227,13 +195,13 @@ public class FlowMachineTests
             });
 
         // Act
-        request.OnCreate(flowMachine);
-        flowMachine.Fire(request, request.CurrentStatus!.Value);
+        _request.OnCreate(_flowMachine);
+        _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
 
         // Assert
-        Assert.True(request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
         Assert.True(currentStatus!.Value == MyRequestStatus.Draft);
         Assert.True(nextStatus!.Value == MyRequestStatus.WaitingForManager1);
-        Assert.True(request.Value == 1);
+        Assert.True(_request.Value == 1);
     }
 }

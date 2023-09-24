@@ -10,7 +10,8 @@ namespace Demo.Services
     public class TestRequestService
     {
         private readonly FlowMachine<TestRequest, Guid, TestStatus> _flowMachine 
-            = new(TestStatus.Draft);
+            = FlowMachine<TestRequest, Guid, TestStatus>.Create(TestStatus.Draft);
+
         private readonly DemoDBContext _context;
 
         public TestRequestService(DemoDBContext context)

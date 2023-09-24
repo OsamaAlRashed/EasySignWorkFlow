@@ -16,9 +16,8 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
     internal TStatus? CancelStatus { get; private set; }
     internal TStatus InitStatus { get; private set; }
 
-    public FlowMachine(TStatus initStatus)
+    private FlowMachine(TStatus initStatus)
     {
-        InitStatus = initStatus;
 
         Map = new Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>>
         {
@@ -30,6 +29,13 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
             request.AddState(new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty));
             return Task.CompletedTask;
         };
+    }
+
+    public static FlowMachine<TRequest, TKey, TStatus> Create(TStatus initStatus)
+    {
+        FlowMachine<TRequest, TKey, TStatus> flowMachine = new(initStatus);
+
+        return flowMachine;
     }
 
     public FlowMachine<TRequest, TKey, TStatus> SetCancelState(TStatus status)
