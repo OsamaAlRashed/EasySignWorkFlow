@@ -2,7 +2,7 @@
 using EasySignWorkFlow.Tests.Models;
 using Xunit;
 
-namespace EasySignWorkFlow.Tests
+namespace EasySignWorkFlow.Tests.IntegrationTests
 {
     public class FlowMachineTests
     {

@@ -2,9 +2,8 @@
 using EasySignWorkFlow.Tests.Models;
 using Xunit;
 
-namespace EasySignWorkFlow.Tests;
+namespace EasySignWorkFlow.Tests.IntegrationTests;
 
-// Todo: rename the tests
 public class ActionExtensionsTests
 {
     private FlowMachine<MyRequest, Guid, MyRequestStatus> _flowMachine;
@@ -86,7 +85,7 @@ public class ActionExtensionsTests
             .Set(MyRequestStatus.Accepted);
 
         // Act
-        
+
         //Assert
         Assert.ThrowsAny<Exception>(() => _request.Approve(_flowMachine));
     }
