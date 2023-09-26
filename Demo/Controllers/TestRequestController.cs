@@ -40,4 +40,7 @@ public class TestRequestController : ControllerBase
         await _testRequestService.Clear();
         return Ok();
     }
+
+    [HttpGet]
+    public IActionResult Print() => Ok(_testRequestService.Print());
 }

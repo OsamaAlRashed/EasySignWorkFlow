@@ -29,10 +29,9 @@ public abstract class Request<TKey, TStatus>
         => Statuses.Count > 1 ? Statuses[^2].Status.ToString() : null;
 
     [NotMapped]
-    public virtual DateTime? LastSignDate 
+    public virtual DateTime? LastSignDate
         => Statuses.OrderByDescending(x => x.DateSigned)
-            .Select(x => x.DateSigned)
-            .FirstOrDefault();
+            .FirstOrDefault()?.DateSigned;
 
     [NotMapped]
     public virtual TKey? LastSignBy => Statuses

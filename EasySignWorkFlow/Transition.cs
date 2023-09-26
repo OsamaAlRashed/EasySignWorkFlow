@@ -17,7 +17,7 @@ public sealed class Transition<TRequest, TKey, TStatus>
     
     private readonly TStatus _current;
 
-    public TStatus? Next { get; private set; }
+    internal TStatus? Next { get; private set; }
 
     public Transition(FlowMachine<TRequest, TKey, TStatus> flow, TStatus current)
     {
@@ -46,22 +46,15 @@ public sealed class Transition<TRequest, TKey, TStatus>
         return this;
     }
 
-    public Transition<TRequest, TKey, TStatus> OnExecute(Action<TRequest, TStatus, TStatus> action)
-    {
-        _onExecuteAsync = (request, status, nextStatus) =>
+    public void OnExecute(Action<TRequest, TStatus, TStatus> action) 
+        => _onExecuteAsync = 
+        (request, status, nextStatus) =>
         {
             action(request, status, nextStatus);
             return Task.CompletedTask;
         };
 
-        return this;
-    }
-
-    public Transition<TRequest, TKey, TStatus> OnExecuteAsync(Func<TRequest, TStatus, TStatus, Task> action)
-    {
-        _onExecuteAsync = action;
-        return this;
-    }
+    public void OnExecuteAsync(Func<TRequest, TStatus, TStatus, Task> action) => _onExecuteAsync = action;
 
     public Transition<TRequest, TKey, TStatus> SetNextUsersAsync(Func<TRequest, TStatus, Task<IEnumerable<TKey>>> func)
     {

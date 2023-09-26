@@ -54,6 +54,7 @@ namespace Demo.Services
         }
 
         public async Task<List<TestRequest>> Get() => await _context.TestRequests.ToListAsync();
+        public string Print() => _flowMachine.ToString();
 
         public async Task<TestRequest?> Get(Guid id) => await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
         

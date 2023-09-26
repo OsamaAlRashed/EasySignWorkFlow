@@ -1,5 +1,6 @@
 ﻿using EasySignWorkFlow.Enums;
 using EasySignWorkFlow.Models;
+using System.Text;
 
 namespace EasySignWorkFlow;
 
@@ -124,5 +125,44 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
             return DateTime.UtcNow;
 
         return DateTime.Now;
+    }
+
+    public override string ToString()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.AppendLine($"Initial Status: {InitStatus.ToString()}");
+        foreach (var item in Map)
+        {
+            stringBuilder.AppendLine($"Transitions of {item.Key.ToString()}:");
+            foreach (var transition in item.Value)
+            {
+                stringBuilder.AppendLine($"{item.Key.ToString()} -----> {transition.Next!.ToString()}");
+            }
+        }
+
+        var finalStatuses = Map.Values
+            .SelectMany(x => x)
+            .Select(x => (TStatus)x.Next!)
+            .Distinct()
+            .Except(Map.Keys);            ;
+
+        stringBuilder.AppendLine($"Final statuses:");
+        foreach (var finalStatus in finalStatuses)
+        {
+            stringBuilder.AppendLine($"{finalStatus.ToString()}");
+        }
+
+        if(CancelStatus is not null)
+        {
+            stringBuilder.AppendLine($"Cancel Status: {CancelStatus.ToString()}");
+        }
+
+        if (RefuseStatus is not null)
+        {
+            stringBuilder.AppendLine($"Refuse Status: {RefuseStatus.ToString()}");
+        }
+
+        return stringBuilder.ToString();
     }
 }
