@@ -20,16 +20,4 @@ public class FlowMachineUnitTests
         Assert.True(request.LastSignBy == default);
         Assert.True(request.LastSignDate is null);
     }
-
-    [Fact]
-    public void Test2()
-    {
-        var requestMock = Substitute.For<MyRequest>();
-        requestMock.Statuses.Returns(new List<State<Guid, MyRequestStatus>>()
-        {
-            new State<Guid, MyRequestStatus>(MyRequestStatus.Draft, DateTime.Now, Guid.Empty, string.Empty)
-        });
-
-        var x = requestMock.CurrentStatus;
-    }
 }
