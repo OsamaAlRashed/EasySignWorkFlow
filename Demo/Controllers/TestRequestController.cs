@@ -1,4 +1,5 @@
 ﻿using Demo.Services;
+using EasySignWorkFlow.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Demo.Controllers;
@@ -43,4 +44,12 @@ public class TestRequestController : ControllerBase
 
     [HttpGet]
     public IActionResult Print() => Ok(_testRequestService.Print());
+
+    [HttpGet]
+    public async Task<IActionResult> GetNextUsers(Guid id)
+    {
+        var result = await _testRequestService.GetNextUsers(id);
+
+        return Ok(result.ToList());
+    }
 }

@@ -11,4 +11,8 @@
     <RepositoryUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</RepositoryUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="EasySignWorkFlow.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -2,6 +2,7 @@
 using Demo.Models;
 using Demo.Models.DBContext;
 using EasySignWorkFlow;
+using EasySignWorkFlow.Enums;
 using EasySignWorkFlow.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +21,12 @@ namespace Demo.Services
 
             _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
 
+            _flowMachine.SetDateTimeProvider(DateTimeProvider.Now);
+
             _flowMachine.When(TestStatus.Draft)
                 .If(request => request.Flag)
                 .Set(TestStatus.WaitingForManager1)
+                .SetNextUsers((request, _) => Enumerable.Range(0, 2).Select(x => Guid.NewGuid()).ToList())
                 .OnExecute((request, current, next) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
@@ -31,6 +35,7 @@ namespace Demo.Services
             _flowMachine.When(TestStatus.Draft)
                 .If(request => !request.Flag)
                 .Set(TestStatus.WaitingForManager2)
+                .SetNextUsers((request, _) => Enumerable.Range(0, 2).Select(x => Guid.NewGuid()).ToList())
                 .OnExecute((request, current, next) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
@@ -54,6 +59,7 @@ namespace Demo.Services
         }
 
         public async Task<List<TestRequest>> Get() => await _context.TestRequests.ToListAsync();
+        
         public string Print() => _flowMachine.ToString();
 
         public async Task<TestRequest?> Get(Guid id) => await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
@@ -149,6 +155,16 @@ namespace Demo.Services
             await _context.SaveChangesAsync();
 
             return result;
+        }
+
+        public async Task<IEnumerable<Guid>> GetNextUsers(Guid id)
+        {
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (request == null)
+                return Enumerable.Empty<Guid>();
+
+            return await request.GetNextUsersAsync(_flowMachine);
         }
     }
 }

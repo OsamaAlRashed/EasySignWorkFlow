@@ -8,38 +8,34 @@ public abstract class Request<TKey, TStatus>
 {
     private readonly List<State<TKey, TStatus>> _statuses = new();
 
-    public IReadOnlyList<State<TKey, TStatus>> Statuses => _statuses.AsReadOnly();
+    public IReadOnlyList<State<TKey, TStatus>> Statuses 
+        => _statuses.AsReadOnly();
+
+    [NotMapped]
+    public virtual State<TKey, TStatus>? CurrentState
+        => Statuses.Count > 0 ? Statuses[^1] : null;
 
     [NotMapped]
     public virtual TStatus? CurrentStatus
-        => _statuses.OrderByDescending(x => x.DateSigned)
-            .FirstOrDefault()?.Status;
+        => CurrentState?.Status;
 
     [NotMapped]
-    public virtual State<TKey, TStatus>? CurrentState 
-        => _statuses.OrderByDescending(x => x.DateSigned)
-                .FirstOrDefault();
+    public virtual State<TKey, TStatus>? PreviousState
+        => Statuses.Count > 1 ? Statuses[^2] : null;
 
     [NotMapped]
     public virtual TStatus? PreviousStatus 
         => Statuses.Count > 1 ? Statuses[^2].Status : null;
 
     [NotMapped]
-    public virtual string? PreviousStatusName
-        => Statuses.Count > 1 ? Statuses[^2].Status.ToString() : null;
-
-    [NotMapped]
     public virtual DateTime? LastSignDate
-        => Statuses.OrderByDescending(x => x.DateSigned)
-            .FirstOrDefault()?.DateSigned;
+        => CurrentState?.DateSigned;
 
     [NotMapped]
-    public virtual TKey? LastSignBy => Statuses
-        .OrderByDescending(x => x.DateSigned)
-        .Select(x => x.SignedBy)
-        .FirstOrDefault();
+    public virtual TKey? LastSignBy
+        => CurrentState is null ? default : CurrentState.SignedBy; // Todo
 
     internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
 
-    internal void Reset() => _statuses.Clear();
+    internal void Clear() => _statuses.Clear();
 }

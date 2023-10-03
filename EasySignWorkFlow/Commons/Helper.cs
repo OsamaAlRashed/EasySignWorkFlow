@@ -22,4 +22,10 @@ internal static class Helper
         where TRequest : Request<TKey, TStatus>
         => !flowMachine.Map.ContainsKey(currentStatus) ||
            !flowMachine.Map[currentStatus].Any();
+
+    internal static bool IsInitialStatus<TRequest, TKey, TStatus>(this TStatus currentStatus, FlowMachine<TRequest, TKey, TStatus> flowMachine)
+        where TKey : IEquatable<TKey>
+        where TStatus : struct, Enum
+        where TRequest : Request<TKey, TStatus>
+        => currentStatus.Equals(flowMachine.InitStatus);
 }
