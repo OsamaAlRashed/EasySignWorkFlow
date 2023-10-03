@@ -45,6 +45,9 @@ public class TestRequestController : ControllerBase
     [HttpGet]
     public IActionResult Print() => Ok(_testRequestService.Print());
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Print(Guid id) => Ok(await _testRequestService.Print(id));
+
     [HttpGet]
     public async Task<IActionResult> GetNextUsers(Guid id)
     {

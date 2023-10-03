@@ -62,6 +62,12 @@ namespace Demo.Services
         
         public string Print() => _flowMachine.ToString();
 
+        public async Task<string> Print(Guid id)
+        {
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+            return request!.ToString();
+        }
+
         public async Task<TestRequest?> Get(Guid id) => await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
         
         public async Task Clear()
