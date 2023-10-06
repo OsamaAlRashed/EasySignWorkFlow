@@ -60,7 +60,17 @@ public static class ApproveRequestExtensions
         });
 
         var result = flowMachine.Fire(request, request.CurrentStatus.Value);
-        if (result && action is not null)
+
+        if (!result)
+        {
+            return Result<TStatus>.SetFailed(
+                 ActionType.Approve,
+                 request.CurrentStatus,
+                 request.CurrentStatus,
+                 "Can not find the next state.");
+        }
+
+        if (action is not null)
             action(request);
 
         return Result<TStatus>.SetSuccess(
