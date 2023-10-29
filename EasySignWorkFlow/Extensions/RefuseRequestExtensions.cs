@@ -59,6 +59,9 @@ public static class RefuseRequestExtensions
         if (action is not null)
             action(request);
 
+        if (flowMachine.OnRefuseAsync is not null)
+            flowMachine.OnRefuseAsync(request, current, flowMachine.RefuseStatus.Value);
+
         return Result<TStatus>.SetSuccess(
             ActionType.Refuse,
             current,

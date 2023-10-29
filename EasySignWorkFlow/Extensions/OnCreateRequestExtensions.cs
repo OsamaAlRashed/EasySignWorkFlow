@@ -22,6 +22,9 @@ public static class OnCreateRequestExtensions
 
         request.Add(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
 
+        if (flowMachine.OnInitAsync is not null)
+            flowMachine.OnInitAsync(request, flowMachine.InitStatus, flowMachine.InitStatus);
+
         return Result<TStatus>.SetSuccess(
             ActionType.OnCreate,
             flowMachine.InitStatus,

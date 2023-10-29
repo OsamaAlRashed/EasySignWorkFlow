@@ -16,6 +16,9 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
     internal TStatus? RefuseStatus { get; private set; }
     internal TStatus? CancelStatus { get; private set; }
     internal TStatus InitStatus { get; private set; }
+    internal Func<TRequest, TStatus, TStatus, Task>? OnInitAsync { get; private set; }
+    internal Func<TRequest, TStatus, TStatus, Task>? OnRefuseAsync { get; private set; }
+    internal Func<TRequest, TStatus, TStatus, Task>? OnCancelAsync { get; private set; }
 
     private FlowMachine(TStatus initStatus)
     {
@@ -32,16 +35,20 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
         };
     }
 
-    public static FlowMachine<TRequest, TKey, TStatus> Create(TStatus initStatus)
+    public static FlowMachine<TRequest, TKey, TStatus> Create(TStatus initStatus, Func<TRequest, TStatus, TStatus, Task>? onInitAsync = null)
     {
         FlowMachine<TRequest, TKey, TStatus> flowMachine = new(initStatus);
+
+        flowMachine.OnInitAsync = onInitAsync;
 
         return flowMachine;
     }
 
-    public FlowMachine<TRequest, TKey, TStatus> SetCancelState(TStatus status)
+    public FlowMachine<TRequest, TKey, TStatus> SetCancelState(TStatus status, Func<TRequest, TStatus, TStatus, Task>? onCancelAsync = null)
     {
         CancelStatus = status;
+
+        OnCancelAsync = onCancelAsync;
 
         return this;
     }
@@ -53,9 +60,11 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
         return this;
     }
 
-    public FlowMachine<TRequest, TKey, TStatus> SetRefuseState(TStatus status)
+    public FlowMachine<TRequest, TKey, TStatus> SetRefuseState(TStatus status, Func<TRequest, TStatus, TStatus, Task>? onRefuseAsync = null)
     {
         RefuseStatus = status;
+
+        OnRefuseAsync = onRefuseAsync;
 
         return this;
     }

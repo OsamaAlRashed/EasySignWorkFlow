@@ -59,6 +59,9 @@ public static class CancelRequestExtensions
         if (action is not null)
             action(request);
 
+        if (flowMachine.OnCancelAsync is not null)
+            flowMachine.OnCancelAsync(request, current, flowMachine.CancelStatus.Value);
+
         return Result<TStatus>.SetSuccess(
             ActionType.Cancel,
             current,
