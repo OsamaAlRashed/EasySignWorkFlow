@@ -20,6 +20,9 @@ public class TestRequestController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get() => Ok(await _testRequestService.Get());
 
+    [HttpGet]
+    public async Task<IActionResult> GetByStatus() => Ok(await _testRequestService.GetByStatus());
+
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id) => Ok(await _testRequestService.Get(id));
 

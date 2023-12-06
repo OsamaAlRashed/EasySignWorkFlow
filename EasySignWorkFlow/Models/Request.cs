@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿    using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EasySignWorkFlow.Models;
@@ -12,13 +12,20 @@ public abstract class Request<TKey, TStatus>
     public IReadOnlyList<State<TKey, TStatus>> Statuses 
         => _statuses.AsReadOnly();
 
+
     [NotMapped]
     public virtual State<TKey, TStatus>? CurrentState
-        => Statuses.Count > 0 ? Statuses[^1] : null;
+        => _statuses
+            .OrderByDescending(x => x.DateSigned)
+            .FirstOrDefault();
 
     [NotMapped]
     public virtual TStatus? CurrentStatus
-        => CurrentState?.Status;
+         => _statuses
+            .OrderByDescending(x => x.DateSigned)
+            .Select(x => x.Status)
+            .FirstOrDefault();
+
 
     [NotMapped]
     public virtual State<TKey, TStatus>? PreviousState
@@ -34,7 +41,7 @@ public abstract class Request<TKey, TStatus>
 
     [NotMapped]
     public virtual TKey? LastSignBy
-        => CurrentState is null ? default : CurrentState.SignedBy; // Todo
+        => CurrentState is null ? default : CurrentState.SignedBy;
 
     internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
 

@@ -59,7 +59,13 @@ namespace Demo.Services
         }
 
         public async Task<List<TestRequest>> Get() => await _context.TestRequests.ToListAsync();
-        
+
+        public async Task<List<TestStatus?>> GetByStatus() 
+            => await _context.TestRequests
+            .Where(x => x.CurrentStatus == TestStatus.Draft)
+            .Select(x => x.CurrentStatus)
+            .ToListAsync();
+
         public string Print() => _flowMachine.ToString();
 
         public async Task<string> Print(Guid id)
