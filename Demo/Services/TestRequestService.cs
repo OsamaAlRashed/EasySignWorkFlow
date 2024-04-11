@@ -10,14 +10,21 @@ namespace Demo.Services
 {
     public class TestRequestService
     {
-        private readonly FlowMachine<TestRequest, Guid, TestStatus> _flowMachine 
-            = FlowMachine<TestRequest, Guid, TestStatus>.Create(TestStatus.Draft);
+        private readonly FlowMachine<TestRequest, Guid, TestStatus> _flowMachine;
 
         private readonly DemoDBContext _context;
 
         public TestRequestService(DemoDBContext context)
         {
             _context = context;
+
+            _flowMachine = FlowMachine<TestRequest, Guid, TestStatus>
+                .Create(TestStatus.Draft, (request, current, next) =>
+                {
+                    var x = _context.TestRequests.ToList();
+
+                    return Task.CompletedTask;
+                });
 
             _flowMachine.SetCancelState(TestStatus.Canceled).SetRefuseState(TestStatus.Refused);
 
@@ -26,8 +33,8 @@ namespace Demo.Services
             _flowMachine.When(TestStatus.Draft)
                 .If(request => request.Flag)
                 .Set(TestStatus.WaitingForManager1)
-                .SetNextUsers((request, _) => Enumerable.Range(0, 2).Select(x => Guid.NewGuid()).ToList())
-                .OnExecute((request, current, next) =>
+                .SetNextUsers((request, _) => Enumerable.Range(0, 1).Select(x => Guid.NewGuid()).ToList())
+                .OnExecute((request, current, next, nextUserIds) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
@@ -36,7 +43,7 @@ namespace Demo.Services
                 .If(request => !request.Flag)
                 .Set(TestStatus.WaitingForManager2)
                 .SetNextUsers((request, _) => Enumerable.Range(0, 2).Select(x => Guid.NewGuid()).ToList())
-                .OnExecute((request, current, next) =>
+                .OnExecute((request, current, next, nextUserIds) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
@@ -44,7 +51,7 @@ namespace Demo.Services
             _flowMachine.When(TestStatus.WaitingForManager1)
                 .If(request => !request.Flag)
                 .Set(TestStatus.Accepted)
-                .OnExecute((request, current, next) =>
+                .OnExecute((request, current, next, nextUserIds) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });
@@ -52,7 +59,7 @@ namespace Demo.Services
             _flowMachine.When(TestStatus.WaitingForManager2)
                 .If(request => !request.Flag)
                 .Set(TestStatus.Accepted)
-                .OnExecute((request, current, next) =>
+                .OnExecute((request, current, next, nextUserIds) =>
                 {
                     Console.WriteLine($"{request.Title} moved from {current} to {next}");
                 });

@@ -11,10 +11,6 @@ public class DemoDBContext : DbContext
     {
         modelBuilder.Entity<TestRequest>().OwnsMany("TestRequestStatus", x => x.Statuses);
 
-        modelBuilder.Entity<TestRequest>()
-            .Property(x => x.CurrentStatus)
-            .HasComputedColumnSql("select top(1) status from dbo.TestRequests order by DateSigned desc");
-
         base.OnModelCreating(modelBuilder);
     }
 

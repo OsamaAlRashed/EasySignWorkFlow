@@ -11,7 +11,7 @@ public sealed class Transition<TRequest, TKey, TStatus>
     
     private Func<TRequest, Task<bool>> _predicate = (_) => Task.FromResult(true);
 
-    private Func<TRequest, TStatus, TStatus, Task>? _onExecuteAsync;
+    private Func<TRequest, TStatus, TStatus, IEnumerable<TKey>, Task>? _onExecuteAsync;
 
     private Func<TRequest, TStatus, Task<IEnumerable<TKey>>>? _nextUsersGetter;
     
@@ -46,15 +46,15 @@ public sealed class Transition<TRequest, TKey, TStatus>
         return this;
     }
 
-    public void OnExecute(Action<TRequest, TStatus, TStatus> action) 
+    public void OnExecute(Action<TRequest, TStatus, TStatus, IEnumerable<TKey>> action) 
         => _onExecuteAsync = 
-        (request, status, nextStatus) =>
+        (request, status, nextStatus, nextUserIds) =>
         {
-            action(request, status, nextStatus);
+            action(request, status, nextStatus, nextUserIds);
             return Task.CompletedTask;
         };
 
-    public void OnExecuteAsync(Func<TRequest, TStatus, TStatus, Task> action) => _onExecuteAsync = action;
+    public void OnExecuteAsync(Func<TRequest, TStatus, TStatus, IEnumerable<TKey>, Task> action) => _onExecuteAsync = action;
 
     public Transition<TRequest, TKey, TStatus> SetNextUsersAsync(Func<TRequest, TStatus, Task<IEnumerable<TKey>>> func)
     {
@@ -81,7 +81,7 @@ public sealed class Transition<TRequest, TKey, TStatus>
         if(_onExecuteAsync is null || !Next.HasValue)
             return;
 
-        await _onExecuteAsync.Invoke(request, current, Next.Value)!;
+        await _onExecuteAsync.Invoke(request, current, Next.Value, _nextUsersGetter is null ? new List<TKey>() : await _nextUsersGetter(request, current))!;
     }
         
     internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current)

@@ -53,7 +53,7 @@ public abstract class Request<TKey, TStatus>
 
         for (int i = 0; i < Statuses.Count; i++)
         {
-            stringBuilder.Append($"Step ({i}): {Statuses[i].Status.ToString()}");
+            stringBuilder.Append($"Step ({i + 1}): {Statuses[i].Status.ToString()}");
 
             if (Statuses[i].DateSigned is not null)
             {
