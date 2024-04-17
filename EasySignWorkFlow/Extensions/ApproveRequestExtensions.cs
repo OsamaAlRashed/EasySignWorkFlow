@@ -56,7 +56,9 @@ public static class ApproveRequestExtensions
         flowMachine.SetTransition((request, current, next) => 
         {
             nextStatus = next;
-            request.Add(new State<TKey, TStatus>(next, flowMachine.GetCurrentDateTime(), signedBy, note));
+            var newState = new State<TKey, TStatus>(next, flowMachine.GetCurrentDateTime(), signedBy, note);
+            request.Add(newState);
+            request.UpdateCurrentState(newState);
         });
 
         var result = flowMachine.Fire(request, request.CurrentStatus.Value);

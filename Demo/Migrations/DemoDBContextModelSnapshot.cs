@@ -29,12 +29,16 @@ namespace Demo.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CurrentStatus")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("int")
-                        .HasComputedColumnSql("select top(1) status from dbo.TestRequests order by DateSigned desc");
+                        .HasColumnType("int");
 
                     b.Property<bool>("Flag")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("LastSignBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("LastSignDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");

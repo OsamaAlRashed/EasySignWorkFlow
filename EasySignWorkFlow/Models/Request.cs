@@ -12,40 +12,35 @@ public abstract class Request<TKey, TStatus>
     public IReadOnlyList<State<TKey, TStatus>> Statuses 
         => _statuses.AsReadOnly();
 
-
-    [NotMapped]
-    public virtual State<TKey, TStatus>? CurrentState
-        => _statuses
-            .OrderByDescending(x => x.DateSigned)
-            .FirstOrDefault();
-
-    [NotMapped]
-    public virtual TStatus? CurrentStatus
-         => _statuses
-            .OrderByDescending(x => x.DateSigned)
-            .Select(x => x.Status)
-            .FirstOrDefault();
-
+    public virtual TStatus? CurrentStatus { get; private set; }
+    public virtual DateTime? LastSignDate { get; private set; }
+    public virtual TKey? LastSignBy { get; private set; }
 
     [NotMapped]
     public virtual State<TKey, TStatus>? PreviousState
         => Statuses.Count > 1 ? Statuses[^2] : null;
 
     [NotMapped]
-    public virtual TStatus? PreviousStatus 
+    public virtual State<TKey, TStatus>? CurrentState
+    => _statuses
+        .OrderByDescending(x => x.DateSigned)
+        .FirstOrDefault();
+
+    [NotMapped]
+    public virtual TStatus? PreviousStatus
         => Statuses.Count > 1 ? Statuses[^2].Status : null;
-
-    [NotMapped]
-    public virtual DateTime? LastSignDate
-        => CurrentState?.DateSigned;
-
-    [NotMapped]
-    public virtual TKey? LastSignBy
-        => CurrentState is null ? default : CurrentState.SignedBy;
+    
 
     internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
 
     internal void Clear() => _statuses.Clear();
+
+    internal void UpdateCurrentState(State<TKey, TStatus> state)
+    {
+        CurrentStatus = state.Status;
+        LastSignBy = state.SignedBy;
+        LastSignDate = state.DateSigned;
+    }
 
     public override string ToString()
     {

@@ -55,7 +55,11 @@ public static class RefuseRequestExtensions
 
         TStatus current = request.CurrentStatus.Value;
 
-        request.Add(new State<TKey, TStatus>(flowMachine.RefuseStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note));
+        var newState = new State<TKey, TStatus>(flowMachine.RefuseStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note);
+        request.Add(newState);
+        request.UpdateCurrentState(newState);
+
+
         if (action is not null)
             action(request);
 

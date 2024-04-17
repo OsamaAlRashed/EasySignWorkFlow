@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Demo.Migrations
 {
     [DbContext(typeof(DemoDBContext))]
-    [Migration("20230922164058_Init")]
-    partial class Init
+    [Migration("20240417104730_test")]
+    partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,8 +30,17 @@ namespace Demo.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("CurrentStatus")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Flag")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("LastSignBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("LastSignDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");

@@ -28,8 +28,9 @@ public class RequestUnitTests
         DateTime firstDateTime = DateTime.Now;
         string firstNote = "firstNote";
 
-
-        request.Add(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft, firstDateTime, firstUserId, firstNote));
+        var newState = new State<Guid, MyRequestStatus>(MyRequestStatus.Draft, firstDateTime, firstUserId, firstNote);
+        request.Add(newState);
+        request.UpdateCurrentState(newState);
 
         Assert.True(request.Statuses.Count == 1);
         Assert.True(request.CurrentState is not null);
@@ -54,8 +55,13 @@ public class RequestUnitTests
         DateTime secondDateTime = DateTime.Now;
         string secondNote = "secondNote";
 
-        request.Add(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft, firstDateTime, firstUserId, firstNote));
-        request.Add(new State<Guid, MyRequestStatus>(MyRequestStatus.WaitingForManager1, secondDateTime, secondUserId, secondNote));
+        var newState = new State<Guid, MyRequestStatus>(MyRequestStatus.Draft, firstDateTime, firstUserId, firstNote);
+        request.Add(newState);
+        request.UpdateCurrentState(newState);
+
+        newState = new State<Guid, MyRequestStatus>(MyRequestStatus.WaitingForManager1, secondDateTime, secondUserId, secondNote);
+        request.Add(newState);
+        request.UpdateCurrentState(newState);
 
         Assert.True(request.Statuses.Count == 2);
         Assert.True(request.CurrentStatus == MyRequestStatus.WaitingForManager1);

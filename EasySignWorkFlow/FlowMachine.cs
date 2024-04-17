@@ -30,7 +30,9 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
         _onTransaction = (request, current, next) =>
         {
-            request.Add(new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty));
+            var newState = new State<TKey, TStatus>(next, GetCurrentDateTime(), default, string.Empty);
+            request.Add(newState);
+            request.UpdateCurrentState(newState);
             return Task.CompletedTask;
         };
     }

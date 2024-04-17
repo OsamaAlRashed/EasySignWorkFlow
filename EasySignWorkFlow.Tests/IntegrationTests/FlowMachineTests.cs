@@ -192,7 +192,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             _flowMachine.When(MyRequestStatus.Draft)
                 .Set(MyRequestStatus.WaitingForManager1)
-                .OnExecute((request, current, next) =>
+                .OnExecute((request, current, next, _) =>
                 {
                     currentStatus = current;
                     nextStatus = next;

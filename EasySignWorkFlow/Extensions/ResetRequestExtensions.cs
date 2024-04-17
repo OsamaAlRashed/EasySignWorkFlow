@@ -48,7 +48,10 @@ public static class ResetRequestExtensions
                 "Can not reset the request if the current status is not refused.");
         }
 
-        request.Add(new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note));
+        var newState = new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note);
+        request.Add(newState);
+        request.UpdateCurrentState(newState);
+
         if (action is not null)
             action(request);
 
