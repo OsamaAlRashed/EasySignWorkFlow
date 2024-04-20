@@ -20,14 +20,14 @@ public static class GetNextUsersRequestExtensions
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (!request.CurrentStatus.HasValue)
+        if (request.CurrentState is null)
             throw new CurrentStatusNullException();
 
-        foreach (var transaction in flowMachine.Map[request.CurrentStatus.Value])
+        foreach (var transaction in flowMachine.Map[request.CurrentState.Status])
         {
             if (await transaction.ValidAsync(request))
             {
-                return await transaction.GetNextUserAsync(request, request.CurrentStatus.Value);
+                return await transaction.GetNextUserAsync(request, request.CurrentState.Status);
             }
         }
 

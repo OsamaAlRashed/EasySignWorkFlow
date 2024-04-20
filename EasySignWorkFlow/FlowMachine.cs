@@ -140,7 +140,7 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
     public override string ToString()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
 
         stringBuilder.AppendLine($"Initial Status: {InitStatus.ToString()}");
         foreach (var item in Map)

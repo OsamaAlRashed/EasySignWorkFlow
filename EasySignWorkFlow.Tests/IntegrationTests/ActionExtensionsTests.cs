@@ -31,7 +31,7 @@ public class ActionExtensionsTests
         _request.Approve(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentStatus == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class ActionExtensionsTests
         _request.Approve(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentStatus == MyRequestStatus.Accepted);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentStatus == MyRequestStatus.Accepted);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class ActionExtensionsTests
         _request.Refuse(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentStatus == MyRequestStatus.Refused);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Refused);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentStatus == MyRequestStatus.Refused);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Refused);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class ActionExtensionsTests
         _request.Reset(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentStatus == MyRequestStatus.Draft);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Draft);
     }
 
     [Fact]
@@ -166,6 +166,6 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentStatus == MyRequestStatus.WaitingForManager1);
+        Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
     }
 }

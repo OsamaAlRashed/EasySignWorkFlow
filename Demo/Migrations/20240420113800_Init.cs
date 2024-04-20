@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Demo.Migrations
 {
-    public partial class test : Migration
+    /// <inheritdoc />
+    public partial class Init : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -16,9 +18,10 @@ namespace Demo.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Flag = table.Column<bool>(type: "bit", nullable: false),
-                    CurrentStatus = table.Column<int>(type: "int", nullable: true),
-                    LastSignDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastSignBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CurrentState_Status = table.Column<int>(type: "int", nullable: true),
+                    CurrentState_DateSigned = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CurrentState_SignedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CurrentState_Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,7 +29,7 @@ namespace Demo.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TestRequestStatus",
+                name: "TestRequestStates",
                 columns: table => new
                 {
                     TestRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -39,9 +42,9 @@ namespace Demo.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TestRequestStatus", x => new { x.TestRequestId, x.Id });
+                    table.PrimaryKey("PK_TestRequestStates", x => new { x.TestRequestId, x.Id });
                     table.ForeignKey(
-                        name: "FK_TestRequestStatus_TestRequests_TestRequestId",
+                        name: "FK_TestRequestStates_TestRequests_TestRequestId",
                         column: x => x.TestRequestId,
                         principalTable: "TestRequests",
                         principalColumn: "Id",
@@ -49,10 +52,11 @@ namespace Demo.Migrations
                 });
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TestRequestStatus");
+                name: "TestRequestStates");
 
             migrationBuilder.DropTable(
                 name: "TestRequests");

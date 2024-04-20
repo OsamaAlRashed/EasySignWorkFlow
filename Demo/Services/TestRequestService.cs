@@ -67,10 +67,10 @@ namespace Demo.Services
 
         public async Task<List<TestRequest>> Get() => await _context.TestRequests.ToListAsync();
 
-        public async Task<List<TestStatus?>> GetByStatus() 
+        public async Task<List<TestStatus>> GetByStatus() 
             => await _context.TestRequests
-            .Where(x => x.CurrentStatus == TestStatus.Draft)
-            .Select(x => x.CurrentStatus)
+            .Where(x => x.CurrentState.Status == TestStatus.Draft)
+            .Select(x => x.CurrentState.Status)
             .ToListAsync();
 
         public string Print() => _flowMachine.ToString();
@@ -151,7 +151,7 @@ namespace Demo.Services
 
             var result = request.Reset(_flowMachine, signedBy, note, (request) =>
             {
-                request.Title = request.Title + " - " + request.CurrentStatus;
+                request.Title = request.Title + " - " + request.CurrentState.Status;
             });
 
             await _context.SaveChangesAsync();
@@ -168,7 +168,7 @@ namespace Demo.Services
 
             var result = request.Cancel(_flowMachine, signedBy, note, (request) =>
             {
-                request.Title = request.Title + " " + request.CurrentStatus;
+                request.Title = request.Title + " " + request.CurrentState.Status;
             });
 
             await _context.SaveChangesAsync();

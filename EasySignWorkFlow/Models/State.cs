@@ -8,7 +8,7 @@ public sealed class State<TKey, TStatus>
 {
     private State() { }
 
-    public State(TStatus status, DateTime dateSigned, TKey? signedBy, string note)
+    public State(TStatus status, DateTime? dateSigned, TKey? signedBy, string? note)
     {
         Status = status;
         DateSigned = dateSigned;

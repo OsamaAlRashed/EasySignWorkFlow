@@ -1,4 +1,5 @@
 ﻿using Demo.Enums;
+using EasySignWorkFlow.EFCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Demo.Models.DBContext;
@@ -9,7 +10,7 @@ public class DemoDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TestRequest>().OwnsMany("TestRequestStatus", x => x.Statuses);
+        modelBuilder.ConfigureRequest<TestRequest, Guid, TestStatus>();
 
         base.OnModelCreating(modelBuilder);
     }

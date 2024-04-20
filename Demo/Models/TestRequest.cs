@@ -1,9 +1,9 @@
 ﻿using Demo.Enums;
-using EasySignWorkFlow.Models;
+using EasySignWorkFlow.EFCore;
 
 namespace Demo.Models;
 
-public class TestRequest : Request<Guid, TestStatus>
+public class TestRequest : EFRequest<Guid, TestStatus>
 {
     public Guid Id { get; set; }
     public string? Title { get; set; }

@@ -13,10 +13,7 @@ public class RequestUnitTests
 
         Assert.True(request.Statuses.Count == 0);
         Assert.True(request.CurrentState is null);
-        Assert.True(request.CurrentStatus is null);
-        Assert.True(request.PreviousStatus is null);
-        Assert.True(request.LastSignBy == default);
-        Assert.True(request.LastSignDate is null);
+        Assert.True(request.CurrentState is null);
     }
 
     [Fact]
@@ -35,10 +32,8 @@ public class RequestUnitTests
         Assert.True(request.Statuses.Count == 1);
         Assert.True(request.CurrentState is not null);
         Assert.True(request.CurrentState.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft)));
-        Assert.True(request.PreviousStatus is null);
-        Assert.True(request.PreviousState is null);
-        Assert.True(request.LastSignBy == firstUserId);
-        Assert.True(request.LastSignDate == firstDateTime);
+        Assert.True(request.CurrentState.SignedBy == firstUserId);
+        Assert.True(request.CurrentState.DateSigned == firstDateTime);
         Assert.True(request.CurrentState!.Note == firstNote);
     }
 
@@ -64,13 +59,10 @@ public class RequestUnitTests
         request.UpdateCurrentState(newState);
 
         Assert.True(request.Statuses.Count == 2);
-        Assert.True(request.CurrentStatus == MyRequestStatus.WaitingForManager1);
+        Assert.True(request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
         Assert.True(request.CurrentState!.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.WaitingForManager1)));
-        Assert.True(request.PreviousStatus == MyRequestStatus.Draft);
-        Assert.True(request.PreviousState!.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft)));
-        Assert.True(request.PreviousState!.Note == firstNote);
         Assert.True(request.CurrentState!.Note == secondNote);
-        Assert.True(request.LastSignBy == secondUserId);
-        Assert.True(request.LastSignDate == secondDateTime);
+        Assert.True(request.CurrentState.SignedBy == secondUserId);
+        Assert.True(request.CurrentState.DateSigned == secondDateTime);
     }
 }

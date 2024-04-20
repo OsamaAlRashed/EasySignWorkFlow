@@ -24,7 +24,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             // Act
 
             // Assert
-            Assert.True(_request.CurrentStatus is null);
+            Assert.True(_request.CurrentState is null);
         }
 
         [Fact]
@@ -36,8 +36,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _request.OnCreate(_flowMachine);
 
             // Assert
-            Assert.True(_request.CurrentStatus is not null &&
-                        _request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.True(_request.CurrentState is not null &&
+                        _request.CurrentState.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -47,10 +47,10 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.True(_request.CurrentState.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -62,10 +62,10 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
         }
 
         [Fact]
@@ -78,10 +78,10 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
         }
 
         [Fact]
@@ -94,11 +94,11 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.False(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -115,11 +115,11 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager2);
-            Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager2);
+            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -136,11 +136,11 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-            Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -157,11 +157,11 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
-            Assert.False(_request.CurrentStatus!.Value == MyRequestStatus.Draft);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
         }
 
         [Fact]
@@ -176,11 +176,11 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.Accepted);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
         }
 
         [Fact]
@@ -201,10 +201,10 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 
             // Act
             _request.OnCreate(_flowMachine);
-            _flowMachine.Fire(_request, _request.CurrentStatus!.Value);
+            _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentStatus!.Value == MyRequestStatus.WaitingForManager1);
+            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
             Assert.True(currentStatus!.Value == MyRequestStatus.Draft);
             Assert.True(nextStatus!.Value == MyRequestStatus.WaitingForManager1);
             Assert.True(_request.Value == 1);

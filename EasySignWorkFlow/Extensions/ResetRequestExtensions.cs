@@ -14,7 +14,7 @@ public static class ResetRequestExtensions
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
-        => request.Reset(flowMachine, default, action);
+        => request.Reset(flowMachine, default!, action);
 
     public static Result<TStatus> Reset<TRequest, TKey, TStatus>(
         this TRequest request,
@@ -36,15 +36,15 @@ public static class ResetRequestExtensions
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (!request.CurrentStatus.HasValue)
+        if (request.CurrentState is null)
             throw new CurrentStatusNullException();
 
-        if (!request.CurrentStatus.Value.IsRefuseStatus(flowMachine))
+        if (!request.CurrentState.Status.IsRefuseStatus(flowMachine))
         {
             return Result<TStatus>.SetFailed(
                 ActionType.Reset,
-                request.CurrentStatus,
-                request.CurrentStatus,
+                request.CurrentState.Status,
+                request.CurrentState.Status,
                 "Can not reset the request if the current status is not refused.");
         }
 

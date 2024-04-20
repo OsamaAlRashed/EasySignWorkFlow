@@ -17,10 +17,10 @@ namespace Demo.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.21")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Demo.Models.TestRequest", b =>
                 {
@@ -28,17 +28,8 @@ namespace Demo.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("CurrentStatus")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Flag")
                         .HasColumnType("bit");
-
-                    b.Property<Guid>("LastSignBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("LastSignDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -50,7 +41,32 @@ namespace Demo.Migrations
 
             modelBuilder.Entity("Demo.Models.TestRequest", b =>
                 {
-                    b.OwnsMany("TestRequestStatus", "Statuses", b1 =>
+                    b.OwnsOne("EasySignWorkFlow.Models.State<System.Guid, Demo.Enums.TestStatus>", "CurrentState", b1 =>
+                        {
+                            b1.Property<Guid>("TestRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTime?>("DateSigned")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Note")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("SignedBy")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Status")
+                                .HasColumnType("int");
+
+                            b1.HasKey("TestRequestId");
+
+                            b1.ToTable("TestRequests");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TestRequestId");
+                        });
+
+                    b.OwnsMany("TestRequestStates", "Statuses", b1 =>
                         {
                             b1.Property<Guid>("TestRequestId")
                                 .HasColumnType("uniqueidentifier");
@@ -59,7 +75,7 @@ namespace Demo.Migrations
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("int");
 
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
 
                             b1.Property<DateTime?>("DateSigned")
                                 .HasColumnType("datetime2");
@@ -75,11 +91,13 @@ namespace Demo.Migrations
 
                             b1.HasKey("TestRequestId", "Id");
 
-                            b1.ToTable("TestRequestStatus");
+                            b1.ToTable("TestRequestStates");
 
                             b1.WithOwner()
                                 .HasForeignKey("TestRequestId");
                         });
+
+                    b.Navigation("CurrentState");
 
                     b.Navigation("Statuses");
                 });

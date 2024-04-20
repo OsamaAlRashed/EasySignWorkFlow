@@ -14,7 +14,7 @@ public static class RefuseRequestExtensions
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
-        => request.Refuse(flowMachine, default, action);
+        => request.Refuse(flowMachine, default!, action);
 
     public static Result<TStatus> Refuse<TRequest, TKey, TStatus>(
         this TRequest request,
@@ -36,24 +36,24 @@ public static class RefuseRequestExtensions
         where TStatus : struct, Enum
         where TRequest : Request<TKey, TStatus>
     {
-        if (!request.CurrentStatus.HasValue)
+        if (request.CurrentState is null)
             throw new CurrentStatusNullException();
 
         if (!flowMachine.RefuseStatus.HasValue)
             throw new RefuseNotSetException();
 
-        if (request.CurrentStatus.Value.IsRefuseStatus(flowMachine) ||
-            request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
-            request.CurrentStatus.Value.IsFinalStatus(flowMachine))
+        if (request.CurrentState.Status.IsRefuseStatus(flowMachine) ||
+            request.CurrentState.Status.IsCancelStatus(flowMachine) ||
+            request.CurrentState.Status.IsFinalStatus(flowMachine))
         {
             return Result<TStatus>.SetFailed(
                 ActionType.Refuse,
-                request.CurrentStatus,
-                request.CurrentStatus,
+                request.CurrentState.Status,
+                request.CurrentState.Status,
                 "Can not refuse the request if the current status is refused, canceled, or it is in final status");
         }
 
-        TStatus current = request.CurrentStatus.Value;
+        TStatus current = request.CurrentState.Status;
 
         var newState = new State<TKey, TStatus>(flowMachine.RefuseStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note);
         request.Add(newState);

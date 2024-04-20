@@ -14,7 +14,7 @@ public static class CancelRequestExtensions
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
-        => request.Cancel(flowMachine, default, action);
+        => request.Cancel(flowMachine, default!, action);
 
     public static Result<TStatus> Cancel<TRequest, TKey, TStatus>(
         this TRequest request,
@@ -36,24 +36,24 @@ public static class CancelRequestExtensions
     where TStatus : struct, Enum
     where TRequest : Request<TKey, TStatus>
     {
-        if (!request.CurrentStatus.HasValue)
+        if (request.CurrentState is null)
             throw new CurrentStatusNullException();
 
         if (!flowMachine.CancelStatus.HasValue)
             throw new CancelNotSetException();
 
-        if (request.CurrentStatus.Value.IsRefuseStatus(flowMachine) ||
-            request.CurrentStatus.Value.IsCancelStatus(flowMachine) ||
-            request.CurrentStatus.Value.IsFinalStatus(flowMachine))
+        if (request.CurrentState.Status.IsRefuseStatus(flowMachine) ||
+            request.CurrentState.Status.IsCancelStatus(flowMachine) ||
+            request.CurrentState.Status.IsFinalStatus(flowMachine))
         {
             return Result<TStatus>.SetFailed(
                 ActionType.Cancel,
-                request.CurrentStatus,
-                request.CurrentStatus,
+                request.CurrentState.Status,
+                request.CurrentState.Status,
                 "Can not cancel the request if the current status is refused, canceled, or it is in final status");
         }
 
-        TStatus current = request.CurrentStatus.Value;
+        TStatus current = request.CurrentState.Status;
 
         var newState = new State<TKey, TStatus>(flowMachine.CancelStatus.Value, flowMachine.GetCurrentDateTime(), signedBy, note);
         request.Add(newState);

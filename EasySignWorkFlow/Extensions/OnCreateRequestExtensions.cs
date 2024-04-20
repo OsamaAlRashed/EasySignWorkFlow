@@ -30,6 +30,6 @@ public static class OnCreateRequestExtensions
         return Result<TStatus>.SetSuccess(
             ActionType.OnCreate,
             flowMachine.InitStatus,
-            request.CurrentStatus);
+            request.CurrentState!.Status);
     }
 }
