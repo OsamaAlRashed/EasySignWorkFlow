@@ -21,7 +21,7 @@ public abstract class Request<TKey, TStatus>
                 .OrderByDescending(x => x.DateSigned)
                 .FirstOrDefault();
         }
-        private set { }
+        protected set { }
     }
 
     internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
