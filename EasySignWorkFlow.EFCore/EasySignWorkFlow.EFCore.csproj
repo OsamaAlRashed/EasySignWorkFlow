@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>EasySignWorkFlow.EFCore</Title>
+    <Authors>Osama Al-Rashed</Authors>
+    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
