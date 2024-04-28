@@ -37,7 +37,7 @@ public static class ApproveRequestExtensions
     where TRequest : Request<TKey, TStatus>
     {
         if (request.CurrentState is null)
-            throw new CurrentStatusNullException();
+            throw new CurrentStateNullException();
 
         if (request.CurrentState.Status.IsRefuseStatus(flowMachine) ||
             request.CurrentState.Status.IsCancelStatus(flowMachine) ||

@@ -176,6 +176,23 @@ namespace Demo.Services
             return result;
         }
 
+        public async Task<bool> Undo(Guid id, Guid signedBy)
+        {
+            var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (request == null)
+                return false;
+
+            var result = request.Undo<TestRequest, Guid, TestStatus>(signedBy, (request) =>
+            {
+                request.Title = request.Title + " " + request.CurrentState!.Status;
+            });
+
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
         public async Task<IEnumerable<Guid>> GetNextUsers(Guid id)
         {
             var request = await _context.TestRequests.FirstOrDefaultAsync(x => x.Id == id);

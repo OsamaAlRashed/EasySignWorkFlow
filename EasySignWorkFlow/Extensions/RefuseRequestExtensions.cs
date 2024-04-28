@@ -37,7 +37,7 @@ public static class RefuseRequestExtensions
         where TRequest : Request<TKey, TStatus>
     {
         if (request.CurrentState is null)
-            throw new CurrentStatusNullException();
+            throw new CurrentStateNullException();
 
         if (!flowMachine.RefuseStatus.HasValue)
             throw new RefuseNotSetException();

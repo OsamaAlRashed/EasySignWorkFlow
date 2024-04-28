@@ -31,7 +31,7 @@ public class ActionExtensionsTests
         _request.Approve(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+        Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class ActionExtensionsTests
         _request.Approve(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
+        Assert.Equal(MyRequestStatus.Accepted, _request.CurrentState!.Status);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
+        Assert.Equal(MyRequestStatus.Accepted, _request.CurrentState!.Status);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class ActionExtensionsTests
         _request.Refuse(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Refused);
+        Assert.Equal(MyRequestStatus.Refused, _request.CurrentState!.Status);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Refused);
+        Assert.Equal(MyRequestStatus.Refused, _request.CurrentState!.Status);
     }
 
     [Fact]
@@ -146,11 +146,11 @@ public class ActionExtensionsTests
         _request.Reset(_flowMachine);
 
         //Assert
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.Draft);
+        Assert.Equal(MyRequestStatus.Draft, _request.CurrentState!.Status);
     }
 
     [Fact]
-    public void Given_RequestIsWaitingForManager1_When_Reset_Then_ResetWillFails()
+    public void Given_RequestIsAccepted_When_Reset_Then_ResetWillFails()
     {
         // Arrange
         _flowMachine.When(MyRequestStatus.Draft)
@@ -166,6 +166,6 @@ public class ActionExtensionsTests
 
         //Assert
         Assert.False(result);
-        Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+        Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
     }
 }

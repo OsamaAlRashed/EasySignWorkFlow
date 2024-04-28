@@ -21,7 +21,7 @@ public static class GetNextUsersRequestExtensions
     where TRequest : Request<TKey, TStatus>
     {
         if (request.CurrentState is null)
-            throw new CurrentStatusNullException();
+            throw new CurrentStateNullException();
 
         foreach (var transaction in flowMachine.Map[request.CurrentState.Status])
         {

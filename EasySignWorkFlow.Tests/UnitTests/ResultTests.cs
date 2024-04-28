@@ -17,12 +17,11 @@ public class ResultTests
         // Assert
         Assert.NotNull(act);
         Assert.True(act.IsSucceeded);
-        Assert.Empty(act.Message);
+        Assert.True(string.IsNullOrEmpty(act.Message));
         Assert.Equal(ActionType.Approve, act.ActionType);
         Assert.Equal(MyRequestStatus.Draft, act.PreviousStatus);
         Assert.Equal(MyRequestStatus.WaitingForManager1, act.NewStatus);
         Assert.True(act);
-        Assert.True(act == true);
     }
 
     [Fact]
@@ -40,6 +39,6 @@ public class ResultTests
         Assert.Equal(MyRequestStatus.Draft, act.PreviousStatus);
         Assert.Equal(MyRequestStatus.Draft, act.NewStatus);
         Assert.False(act);
-        Assert.True(act == false);
+        Assert.False(act);
     }
 }

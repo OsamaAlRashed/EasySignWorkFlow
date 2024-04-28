@@ -33,6 +33,9 @@ public class TestRequestController : ControllerBase
     public async Task<IActionResult> Refuse(Guid id) => Ok(await _testRequestService.Refuse(id, Guid.NewGuid(), "wow!"));
 
     [HttpPut]
+    public async Task<IActionResult> Undo(Guid id, Guid undoBy) => Ok(await _testRequestService.Undo(id, undoBy));
+
+    [HttpPut]
     public async Task<IActionResult> Cancel(Guid id) => Ok(await _testRequestService.Cancel(id, Guid.NewGuid(), "wow!"));
 
     [HttpPut]

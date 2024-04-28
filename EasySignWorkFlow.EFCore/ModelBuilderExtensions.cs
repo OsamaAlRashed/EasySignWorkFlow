@@ -19,10 +19,11 @@ public static class ModelBuilderExtensions
 
     public static void ConfigureRequests(this ModelBuilder modelBuilder, Assembly assembly)
     {
-        var requestTypes = assembly.GetTypes().Where(type =>
-            !type.IsAbstract &&
-             type.IsClass &&
-            typeof(EFRequest<, >).IsAssignableFrom(type));
+        var requestTypes = assembly.GetTypes()
+            .Where(type => 
+                !type.IsAbstract && 
+                type.IsClass &&
+                typeof(EFRequest<,>).IsAssignableFrom(type));
 
         foreach (var type in requestTypes)
         {

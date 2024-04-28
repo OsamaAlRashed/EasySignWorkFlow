@@ -6,5 +6,6 @@ public enum ActionType
     Refuse,
     Cancel,
     Reset,
-    OnCreate
+    OnCreate,
+    Undo
 }

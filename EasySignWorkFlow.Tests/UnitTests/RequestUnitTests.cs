@@ -11,8 +11,7 @@ public class RequestUnitTests
     {
         var request = new MyRequest();
 
-        Assert.True(request.Statuses.Count == 0);
-        Assert.True(request.CurrentState is null);
+        Assert.Empty(request.Statuses);
         Assert.True(request.CurrentState is null);
     }
 
@@ -29,12 +28,12 @@ public class RequestUnitTests
         request.Add(newState);
         request.UpdateCurrentState(newState);
 
-        Assert.True(request.Statuses.Count == 1);
+        Assert.Single(request.Statuses);
         Assert.True(request.CurrentState is not null);
         Assert.True(request.CurrentState.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft)));
-        Assert.True(request.CurrentState.SignedBy == firstUserId);
-        Assert.True(request.CurrentState.DateSigned == firstDateTime);
-        Assert.True(request.CurrentState!.Note == firstNote);
+        Assert.Equal(firstUserId, request.CurrentState.SignedBy);
+        Assert.Equal(firstDateTime, request.CurrentState.DateSigned);
+        Assert.Equal(firstNote, request.CurrentState!.Note);
     }
 
     [Fact]
@@ -58,11 +57,11 @@ public class RequestUnitTests
         request.Add(newState);
         request.UpdateCurrentState(newState);
 
-        Assert.True(request.Statuses.Count == 2);
-        Assert.True(request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+        Assert.Equal(2, request.Statuses.Count);
+        Assert.Equal(MyRequestStatus.WaitingForManager1, request.CurrentState!.Status);
         Assert.True(request.CurrentState!.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.WaitingForManager1)));
-        Assert.True(request.CurrentState!.Note == secondNote);
-        Assert.True(request.CurrentState.SignedBy == secondUserId);
-        Assert.True(request.CurrentState.DateSigned == secondDateTime);
+        Assert.Equal(secondNote, request.CurrentState!.Note);
+        Assert.Equal(secondUserId, request.CurrentState.SignedBy);
+        Assert.Equal(secondDateTime, request.CurrentState.DateSigned);
     }
 }

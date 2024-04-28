@@ -6,8 +6,6 @@ public sealed class State<TKey, TStatus>
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
 {
-    private State() { }
-
     public State(TStatus status, DateTime? dateSigned, TKey? signedBy, string? note)
     {
         Status = status;

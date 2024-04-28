@@ -22,7 +22,6 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
     private FlowMachine(TStatus initStatus)
     {
-
         Map = new Dictionary<TStatus, List<Transition<TRequest, TKey, TStatus>>>
         {
             { initStatus, new List<Transition<TRequest, TKey, TStatus>>() }
@@ -39,9 +38,10 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
 
     public static FlowMachine<TRequest, TKey, TStatus> Create(TStatus initStatus, Func<TRequest, TStatus, TStatus, Task>? onInitAsync = null)
     {
-        FlowMachine<TRequest, TKey, TStatus> flowMachine = new(initStatus);
-
-        flowMachine.OnInitAsync = onInitAsync;
+        FlowMachine<TRequest, TKey, TStatus> flowMachine = new(initStatus)
+        {
+            OnInitAsync = onInitAsync
+        };
 
         return flowMachine;
     }

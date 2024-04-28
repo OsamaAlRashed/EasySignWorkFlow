@@ -6,8 +6,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
 {
     public class FlowMachineTests
     {
-        private FlowMachine<MyRequest, Guid, MyRequestStatus> _flowMachine;
-        private MyRequest _request;
+        private readonly FlowMachine<MyRequest, Guid, MyRequestStatus> _flowMachine;
+        private readonly MyRequest _request;
 
         public FlowMachineTests()
         {
@@ -50,7 +50,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState.Status == MyRequestStatus.Draft);
+            Assert.Equal(MyRequestStatus.Draft, _request.CurrentState.Status);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -97,8 +97,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.False(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.Draft);
+            Assert.NotEqual(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
+            Assert.Equal(MyRequestStatus.Draft, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -118,8 +118,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager2);
-            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
+            Assert.Equal(MyRequestStatus.WaitingForManager2, _request.CurrentState!.Status);
+            Assert.NotEqual(MyRequestStatus.Draft, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -139,8 +139,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
-            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
+            Assert.NotEqual(MyRequestStatus.Draft, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -160,8 +160,8 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
-            Assert.False(_request.CurrentState!.Status == MyRequestStatus.Draft);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
+            Assert.NotEqual(MyRequestStatus.Draft, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -180,7 +180,7 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.Accepted);
+            Assert.Equal(MyRequestStatus.Accepted, _request.CurrentState!.Status);
         }
 
         [Fact]
@@ -204,10 +204,10 @@ namespace EasySignWorkFlow.Tests.IntegrationTests
             _flowMachine.Fire(_request, _request.CurrentState!.Status);
 
             // Assert
-            Assert.True(_request.CurrentState!.Status == MyRequestStatus.WaitingForManager1);
-            Assert.True(currentStatus!.Value == MyRequestStatus.Draft);
-            Assert.True(nextStatus!.Value == MyRequestStatus.WaitingForManager1);
-            Assert.True(_request.Value == 1);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
+            Assert.Equal(MyRequestStatus.Draft, currentStatus!.Value);
+            Assert.Equal(MyRequestStatus.WaitingForManager1, nextStatus!.Value);
+            Assert.Equal(1, _request.Value);
         }
     }
 }

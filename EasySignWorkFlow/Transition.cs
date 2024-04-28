@@ -40,7 +40,6 @@ public sealed class Transition<TRequest, TKey, TStatus>
     public Transition<TRequest, TKey, TStatus> Set(TStatus next)
     {
         Next = next;
-
         _flow.Map[_current].Add(this);
 
         return this;

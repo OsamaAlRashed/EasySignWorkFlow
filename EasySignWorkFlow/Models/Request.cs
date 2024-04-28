@@ -1,4 +1,4 @@
-﻿    using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EasySignWorkFlow.Models;
@@ -27,6 +27,8 @@ public abstract class Request<TKey, TStatus>
     internal void Add(State<TKey, TStatus> state) => _statuses.Add(state);
 
     internal void Clear() => _statuses.Clear();
+
+    internal void Remove(State<TKey, TStatus> state) => _statuses.Remove(state);
 
     public virtual void UpdateCurrentState(State<TKey, TStatus> state) 
     {

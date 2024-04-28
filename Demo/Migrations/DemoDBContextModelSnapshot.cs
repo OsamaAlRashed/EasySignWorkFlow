@@ -36,12 +36,12 @@ namespace Demo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestRequests", (string)null);
+                    b.ToTable("TestRequests");
                 });
 
             modelBuilder.Entity("Demo.Models.TestRequest", b =>
                 {
-                    b.OwnsOne("Demo.Models.TestRequest.CurrentState#EasySignWorkFlow.Models.State<System.Guid, Demo.Enums.TestStatus>", "CurrentState", b1 =>
+                    b.OwnsOne("EasySignWorkFlow.Models.State<System.Guid, Demo.Enums.TestStatus>", "CurrentState", b1 =>
                         {
                             b1.Property<Guid>("TestRequestId")
                                 .HasColumnType("uniqueidentifier");
@@ -60,13 +60,13 @@ namespace Demo.Migrations
 
                             b1.HasKey("TestRequestId");
 
-                            b1.ToTable("TestRequests", (string)null);
+                            b1.ToTable("TestRequests");
 
                             b1.WithOwner()
                                 .HasForeignKey("TestRequestId");
                         });
 
-                    b.OwnsMany("Demo.Models.TestRequest.Statuses#TestRequestStates", "Statuses", b1 =>
+                    b.OwnsMany("TestRequestStates", "Statuses", b1 =>
                         {
                             b1.Property<Guid>("TestRequestId")
                                 .HasColumnType("uniqueidentifier");
@@ -91,7 +91,7 @@ namespace Demo.Migrations
 
                             b1.HasKey("TestRequestId", "Id");
 
-                            b1.ToTable("TestRequestStates", (string)null);
+                            b1.ToTable("TestRequestStates");
 
                             b1.WithOwner()
                                 .HasForeignKey("TestRequestId");

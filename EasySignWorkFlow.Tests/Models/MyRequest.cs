@@ -4,8 +4,6 @@ namespace EasySignWorkFlow.Tests.Models;
 
 public class MyRequest : Request<Guid, MyRequestStatus>
 {
-    public override State<Guid, MyRequestStatus>? CurrentState => base.CurrentState;
-
     public int Id { get; set; }
     public string? Name { get; set; }
     public int Value { get; set; }

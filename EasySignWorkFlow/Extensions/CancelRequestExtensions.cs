@@ -37,7 +37,7 @@ public static class CancelRequestExtensions
     where TRequest : Request<TKey, TStatus>
     {
         if (request.CurrentState is null)
-            throw new CurrentStatusNullException();
+            throw new CurrentStateNullException();
 
         if (!flowMachine.CancelStatus.HasValue)
             throw new CancelNotSetException();

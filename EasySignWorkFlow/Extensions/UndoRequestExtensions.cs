@@ -1,26 +1,41 @@
-﻿namespace EasySignWorkFlow.Extensions;
+﻿using EasySignWorkFlow.Commons;
+using EasySignWorkFlow.Exceptions;
+using EasySignWorkFlow.Models;
+
+namespace EasySignWorkFlow.Extensions;
 
 public static class UndoRequestExtensions
 {
-    //public static Result<TStatus> Undo<TRequest, TKey, TStatus>(
-    //    this TRequest request,
-    //    FlowMachine<TRequest, TKey, TStatus> flowMachine,
-    //    TKey signedBy)
-    //    where TKey : IEquatable<TKey>
-    //    where TStatus : struct, Enum
-    //    where TRequest : Request<TKey, TStatus>
-    //{
-    //    if (!request.CurrentStatus.HasValue)
-    //        throw new CurrentStatusNullException();
+    public static Result<TStatus> Undo<TRequest, TKey, TStatus>(
+        this TRequest request,
+        TKey undoBy,
+        Action<TRequest>? action = default)
+        where TKey : IEquatable<TKey>
+        where TStatus : struct, Enum
+        where TRequest : Request<TKey, TStatus>
+    {
+        if (request.CurrentState is null)
+            throw new CurrentStateNullException();
 
-    //    if (!request.PreviousStatus.HasValue)
-    //        throw new InvalidOperationException("");
+        if (request.Statuses.Count <= 1)
+            throw new InvalidOperationException("");
 
-    //    if (!request.PreviousState!.SignedBy!.Equals(signedBy))
-    //    {
+        var lastState = request.Statuses[^1];
 
-    //    }
+        if (lastState.SignedBy is null || !lastState.SignedBy.Equals(undoBy))
+        {
+            return Result<TStatus>
+                .SetFailed(Enums.ActionType.Undo, lastState.Status, lastState.Status, "Can not undo!");
+        }
 
-    //    return Result<TStatus>.SetSuccess();
-    //}
+        request.Remove(lastState);
+
+        if (action is not null)
+            action(request);
+
+        return Result<TStatus>.SetSuccess(
+            Enums.ActionType.Undo,
+            lastState.Status,
+            request.Statuses[^1].Status);
+    }
 }
