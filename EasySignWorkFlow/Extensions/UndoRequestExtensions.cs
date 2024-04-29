@@ -17,8 +17,8 @@ public static class UndoRequestExtensions
         if (request.CurrentState is null)
             throw new CurrentStateNullException();
 
-        if (request.Statuses.Count <= 1)
-            throw new InvalidOperationException("");
+        if (request.Statuses.Count == 1)
+            throw new InvalidOperationException("The initial state cannot be undone.");
 
         var lastState = request.Statuses[^1];
 

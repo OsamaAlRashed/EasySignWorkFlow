@@ -1,16 +1,14 @@
-﻿using Demo.Enums;
-using EasySignWorkFlow.EFCore;
+﻿using EasySignWorkFlow.EFCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Demo.Models.DBContext;
 
-public class DemoDBContext : DbContext
+public class DemoDBContext(DbContextOptions<DemoDBContext> context) : DbContext(context)
 {
-    public DemoDBContext(DbContextOptions<DemoDBContext> context) : base(context) { }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureRequest<TestRequest, Guid, TestStatus>();
+        modelBuilder.ConfigureRequests(Assembly.GetExecutingAssembly());
 
         base.OnModelCreating(modelBuilder);
     }

@@ -80,7 +80,11 @@ public sealed class Transition<TRequest, TKey, TStatus>
         if(_onExecuteAsync is null || !Next.HasValue)
             return;
 
-        await _onExecuteAsync.Invoke(request, current, Next.Value, _nextUsersGetter is null ? new List<TKey>() : await _nextUsersGetter(request, current))!;
+        await _onExecuteAsync.Invoke(
+            request,
+            current,
+            Next.Value,
+            _nextUsersGetter is null ? new List<TKey>() : await _nextUsersGetter(request, current))!;
     }
         
     internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current)

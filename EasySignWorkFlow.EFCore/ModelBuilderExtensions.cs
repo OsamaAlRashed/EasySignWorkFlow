@@ -19,17 +19,22 @@ public static class ModelBuilderExtensions
 
     public static void ConfigureRequests(this ModelBuilder modelBuilder, Assembly assembly)
     {
-        var requestTypes = assembly.GetTypes()
-            .Where(type => 
-                !type.IsAbstract && 
+        var requestTypes = assembly
+            .GetTypes()
+            .Where(type =>
+                !type.IsAbstract &&
                 type.IsClass &&
-                typeof(EFRequest<,>).IsAssignableFrom(type));
+                type.BaseType != null &&
+                type.BaseType.IsGenericType &&
+                type.BaseType.GetGenericTypeDefinition() == typeof(EFRequest<,>))
+            .ToArray();
+
 
         foreach (var type in requestTypes)
         {
             var method = typeof(ModelBuilderExtensions)
                 .GetMethod(nameof(ConfigureRequest))!
-                .MakeGenericMethod(type, type.GetGenericArguments()[0], type.GetGenericArguments()[1]);
+                .MakeGenericMethod(type, type.BaseType!.GetGenericArguments()[0], type.BaseType.GetGenericArguments()[1]);
             method.Invoke(null, new object[] { modelBuilder });
         }
     }
