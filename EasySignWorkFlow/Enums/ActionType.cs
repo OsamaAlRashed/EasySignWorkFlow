@@ -7,5 +7,6 @@ public enum ActionType
     Cancel,
     Reset,
     OnCreate,
-    Undo
+    Undo,
+    Force
 }

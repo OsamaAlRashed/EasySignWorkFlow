@@ -168,4 +168,38 @@ public class ActionExtensionsTests
         Assert.False(result);
         Assert.Equal(MyRequestStatus.WaitingForManager1, _request.CurrentState!.Status);
     }
+
+    [Fact]
+    public void Given_RequestIsDraft_When_ForceAccepted_Then_TheStatusWillBeClosed()
+    {
+        // Arrange
+        _flowMachine.When(MyRequestStatus.Draft)
+            .Set(MyRequestStatus.WaitingForManager1);
+
+        _flowMachine.When(MyRequestStatus.WaitingForManager1)
+            .Set(MyRequestStatus.Accepted);
+
+        // Act
+        _request.OnCreate(_flowMachine);
+
+        var result = _request.Force(_flowMachine, MyRequestStatus.Accepted, Guid.Empty);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(MyRequestStatus.Accepted, _request.CurrentState!.Status);
+    }
+
+    [Fact]
+    public void Given_NoStatesYet_When_ForceAccepted_Then_TheForceWillFail()
+    {
+        // Arrange
+        _flowMachine.When(MyRequestStatus.Draft)
+            .Set(MyRequestStatus.WaitingForManager1);
+
+        _flowMachine.When(MyRequestStatus.WaitingForManager1)
+            .Set(MyRequestStatus.Accepted);
+
+        // Assert
+        Assert.ThrowsAny<Exception>(() => _request.Force(_flowMachine, MyRequestStatus.Accepted, Guid.Empty));
+    }
 }
