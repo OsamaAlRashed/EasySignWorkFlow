@@ -35,7 +35,7 @@ public static class ModelBuilderExtensions
             var method = typeof(ModelBuilderExtensions)
                 .GetMethod(nameof(ConfigureRequest))!
                 .MakeGenericMethod(type, type.BaseType!.GetGenericArguments()[0], type.BaseType.GetGenericArguments()[1]);
-            method.Invoke(null, new object[] { modelBuilder });
+            method.Invoke(null, [modelBuilder]);
         }
     }
 }
