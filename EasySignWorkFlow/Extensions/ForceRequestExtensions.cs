@@ -40,7 +40,7 @@ public static class ForceRequestExtensions
             action(request);
 
         return Result<TStatus>.SetSuccess(
-            ActionType.Approve,
+            ActionType.Force,
             request.CurrentState.Status,
             status);
     }
