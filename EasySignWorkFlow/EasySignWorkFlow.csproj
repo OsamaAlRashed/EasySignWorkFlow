@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Title>EasySignWorkFlow</Title>
     <Authors>Osama Al-Rashed</Authors>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <PackageProjectUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</PackageProjectUrl>
     <RepositoryUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</RepositoryUrl>
   </PropertyGroup>
