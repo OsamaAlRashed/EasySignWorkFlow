@@ -1,4 +1,5 @@
-﻿using EasySignWorkFlow.Commons;
+﻿using EasySignWorkFlow.Abstractions;
+using EasySignWorkFlow.Commons;
 using EasySignWorkFlow.Enums;
 using EasySignWorkFlow.Exceptions;
 using EasySignWorkFlow.Models;
@@ -13,7 +14,7 @@ public static class ApproveRequestExtensions
        Action<TRequest>? action = default)
    where TKey : IEquatable<TKey>
    where TStatus : struct, Enum
-   where TRequest : Request<TKey, TStatus>
+   where TRequest : IRequest<TKey, TStatus>
        => request.Approve(flowMachine, default!, action);
 
     public static Result<TStatus> Approve<TRequest, TKey, TStatus>(
@@ -23,7 +24,7 @@ public static class ApproveRequestExtensions
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
         => request.Approve(flowMachine, signedBy, string.Empty, action);
 
     public static Result<TStatus> Approve<TRequest, TKey, TStatus>(
@@ -34,7 +35,7 @@ public static class ApproveRequestExtensions
         Action<TRequest>? action = default)
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
     {
         if (request.CurrentState is null)
             throw new CurrentStateNullException();

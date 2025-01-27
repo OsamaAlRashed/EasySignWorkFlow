@@ -1,4 +1,5 @@
-﻿using EasySignWorkFlow.Exceptions;
+﻿using EasySignWorkFlow.Abstractions;
+using EasySignWorkFlow.Exceptions;
 using EasySignWorkFlow.Models;
 
 namespace EasySignWorkFlow.Extensions;
@@ -10,7 +11,7 @@ public static class GetNextUsersRequestExtensions
         FlowMachine<TRequest, TKey, TStatus> flowMachine)
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
         => GetNextUsersAsync(request, flowMachine).GetAwaiter().GetResult();
 
     public static async Task<IEnumerable<TKey>> GetNextUsersAsync<TRequest, TKey, TStatus>(
@@ -18,7 +19,7 @@ public static class GetNextUsersRequestExtensions
         FlowMachine<TRequest, TKey, TStatus> flowMachine)
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
     {
         if (request.CurrentState is null)
             throw new CurrentStateNullException();

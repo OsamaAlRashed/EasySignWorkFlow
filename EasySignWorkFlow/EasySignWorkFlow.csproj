@@ -1,18 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>EasySignWorkFlow</Title>
     <Authors>Osama Al-Rashed</Authors>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <PackageProjectUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</PackageProjectUrl>
     <RepositoryUrl>https://github.com/OsamaAlRashed/EasySignWorkFlow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="EasySignWorkFlow.Tests" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore">
+      <Version>8.0.12</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore">
+      <Version>9.0.1</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

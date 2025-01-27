@@ -1,11 +1,11 @@
-﻿using EasySignWorkFlow.Models;
+﻿using EasySignWorkFlow.Abstractions;
 
 namespace EasySignWorkFlow;
 
 public sealed class Transition<TRequest, TKey, TStatus>
     where TKey : IEquatable<TKey>
     where TStatus : struct, Enum
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
 {
     private readonly FlowMachine<TRequest, TKey, TStatus> _flow;
     
@@ -90,7 +90,7 @@ public sealed class Transition<TRequest, TKey, TStatus>
     internal async Task<IEnumerable<TKey>> GetNextUserAsync(TRequest request, TStatus current)
     {
         if(_nextUsersGetter is null)
-            return Enumerable.Empty<TKey>();
+            return [];
 
         return await _nextUsersGetter.Invoke(request, current)!;
     }

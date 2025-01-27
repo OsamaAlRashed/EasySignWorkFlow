@@ -1,11 +1,12 @@
-﻿using EasySignWorkFlow.Enums;
+﻿using EasySignWorkFlow.Abstractions;
+using EasySignWorkFlow.Enums;
 using EasySignWorkFlow.Models;
 using System.Text;
 
 namespace EasySignWorkFlow;
 
 public sealed class FlowMachine<TRequest, TKey, TStatus> 
-    where TRequest : Request<TKey, TStatus>
+    where TRequest : IRequest<TKey, TStatus>
     where TStatus : struct, Enum
     where TKey : IEquatable<TKey>
 {

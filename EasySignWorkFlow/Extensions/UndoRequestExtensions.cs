@@ -1,4 +1,5 @@
-﻿using EasySignWorkFlow.Commons;
+﻿using EasySignWorkFlow.Abstractions;
+using EasySignWorkFlow.Commons;
 using EasySignWorkFlow.Exceptions;
 using EasySignWorkFlow.Models;
 
@@ -12,7 +13,7 @@ public static class UndoRequestExtensions
         Action<TRequest>? action = default)
         where TKey : IEquatable<TKey>
         where TStatus : struct, Enum
-        where TRequest : Request<TKey, TStatus>
+        where TRequest : IRequest<TKey, TStatus>
     {
         if (request.CurrentState is null)
             throw new CurrentStateNullException();

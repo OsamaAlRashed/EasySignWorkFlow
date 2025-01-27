@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace EasySignWorkFlow.Models;
+﻿namespace EasySignWorkFlow.Models;
 
 public sealed class State<TKey, TStatus>
     where TKey : IEquatable<TKey>
@@ -23,11 +21,7 @@ public sealed class State<TKey, TStatus>
     public DateTime? DateSigned { get; private set; }
     public TKey? SignedBy { get; private set; }
     public string? Note { get; private set; }
-
-    [NotMapped]
     public bool IsSigned => DateSigned.HasValue;
-
-    [NotMapped]
     public string StatusName => Status.ToString();
 
     public override bool Equals(object? obj)

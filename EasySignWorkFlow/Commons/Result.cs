@@ -2,28 +2,19 @@
 
 namespace EasySignWorkFlow.Commons;
 
-public sealed class Result<TStatus>
+public sealed class Result<TStatus>(
+    ActionType actionType,
+    TStatus? previousStatus,
+    TStatus? newStatus,
+    bool isSucceeded,
+    string? message)
     where TStatus : struct, Enum
 {
-    public Result(
-        ActionType actionType,
-        TStatus? previousStatus,
-        TStatus? newStatus,
-        bool isSucceeded,
-        string? message)
-    {
-        ActionType = actionType;
-        PreviousStatus = previousStatus;
-        NewStatus = newStatus;
-        IsSucceeded = isSucceeded;
-        Message = message;
-    }
-
-    public ActionType ActionType { get; private set; }
-    public TStatus? PreviousStatus { get; private set; }
-    public TStatus? NewStatus { get; private set; }
-    public bool IsSucceeded { get; private set; }
-    public string? Message { get; private set; }
+    public ActionType ActionType { get; private set; } = actionType;
+    public TStatus? PreviousStatus { get; private set; } = previousStatus;
+    public TStatus? NewStatus { get; private set; } = newStatus;
+    public bool IsSucceeded { get; private set; } = isSucceeded;
+    public string? Message { get; private set; } = message;
 
 
     internal static Result<TStatus> SetSuccess(ActionType actionType, TStatus? previousStatus, TStatus? newStatus)

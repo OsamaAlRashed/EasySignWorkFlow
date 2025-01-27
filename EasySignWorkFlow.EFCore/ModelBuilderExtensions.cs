@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EasySignWorkFlow.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace EasySignWorkFlow.EFCore;
@@ -6,7 +7,7 @@ namespace EasySignWorkFlow.EFCore;
 public static class ModelBuilderExtensions
 {
     public static void ConfigureRequest<TRequest, TKey, TStatus>(this ModelBuilder modelBuilder)
-        where TRequest : EFRequest<TKey, TStatus>
+        where TRequest : class, IRequest<TKey, TStatus>
         where TKey : IEquatable<TKey>
         where TStatus : struct, Enum
     {
@@ -26,7 +27,7 @@ public static class ModelBuilderExtensions
                 type.IsClass &&
                 type.BaseType != null &&
                 type.BaseType.IsGenericType &&
-                type.BaseType.GetGenericTypeDefinition() == typeof(EFRequest<,>))
+                type.BaseType.GetGenericTypeDefinition() == typeof(IRequest<,>))
             .ToArray();
 
 
