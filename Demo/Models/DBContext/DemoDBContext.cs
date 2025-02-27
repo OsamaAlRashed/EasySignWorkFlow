@@ -9,7 +9,8 @@ public class DemoDBContext(DbContextOptions<DemoDBContext> context) : DbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureRequest<TestRequest, Guid, TestStatus>();
+        modelBuilder.Entity<TestRequest>().OwnsOne(x => x.CurrentState);
+        modelBuilder.Entity<TestRequest>().OwnsMany(x => x.Statuses);
 
         base.OnModelCreating(modelBuilder);
     }

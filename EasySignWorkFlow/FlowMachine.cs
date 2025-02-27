@@ -170,7 +170,7 @@ public sealed class FlowMachine<TRequest, TKey, TStatus>
             stringBuilder.AppendLine($"Cancel Status: {CancelStatus.ToString()}");
         }
 
-        if (RefuseStatus is not null)
+        if(RefuseStatus is not null)
         {
             stringBuilder.AppendLine($"Refuse Status: {RefuseStatus.ToString()}");
         }
