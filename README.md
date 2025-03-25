@@ -2,6 +2,11 @@
 
 EasySignWorkFlow is a C# library designed to provide a flexible and easy-to-use workflow management system. It allows you to define and manage state transitions, perform actions during transitions, and set custom rules for workflows. With features like state validation, transition conditions, and customizable behaviors, EasySignWorkFlow is perfect for implementing approval processes, request management, or any workflow-based application.
 
+# What's new (1.0.8)
+- Handle the exception in `GetNextUsersAsync` if the state does not exist in the map.
+- Add an optional parameter (action) in the `OnCreate` method.
+- Change the property name from `Statuses` to `States` (Breaking change).
+
 ## Features
 
 - **State Management**: Define states and manage transitions seamlessly.
