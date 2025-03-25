@@ -9,8 +9,8 @@ public class DemoDBContext(DbContextOptions<DemoDBContext> context) : DbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TestRequest>().OwnsOne(x => x.CurrentState);
-        modelBuilder.Entity<TestRequest>().OwnsMany(x => x.Statuses);
+        modelBuilder.Entity<TestRequest>().OwnsOne("CurrentState", x => x.CurrentState);
+        modelBuilder.Entity<TestRequest>().OwnsMany("TestRequestStates", x => x.States);
 
         base.OnModelCreating(modelBuilder);
     }

@@ -12,13 +12,14 @@ public static class OnCreateRequestExtensions
         this TRequest request,
         FlowMachine<TRequest, TKey, TStatus> flowMachine,
         TKey? signedBy = default,
-        string note = "")
+        string note = "",
+        Action<TRequest>? action = default)
 
         where TKey : IEquatable<TKey>
         where TStatus : struct, Enum
         where TRequest : IRequest<TKey, TStatus>
     {
-        if (request.Statuses.Any())
+        if (request.States.Any())
             throw new InitialStatusAlreadyExist();
 
         var newState = new State<TKey, TStatus>(flowMachine.InitStatus, flowMachine.GetCurrentDateTime(), signedBy, note);
@@ -27,6 +28,9 @@ public static class OnCreateRequestExtensions
 
         if (flowMachine.OnInitAsync is not null)
             flowMachine.OnInitAsync(request, flowMachine.InitStatus, flowMachine.InitStatus);
+
+        if (action is not null)
+            action(request);
 
         return Result<TStatus>.SetSuccess(
             ActionType.OnCreate,

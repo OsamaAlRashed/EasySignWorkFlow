@@ -42,7 +42,7 @@ public class TestRequest : IRequest<Guid, TestStatus>
     public string? Title { get; set; }
     public bool Flag { get; set; }
 
-    public List<State<Guid, TestStatus>> Statuses { get; } = new();
+    public List<State<Guid, TestStatus>> States { get; } = new();
     public State<Guid, TestStatus>? CurrentState { get; set; }
 }
 ```
@@ -135,7 +135,8 @@ public class DemoDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureRequest<TestRequest, Guid, TestStatus>();
+        modelBuilder.Entity<TestRequest>().OwnsOne("CurrentState", x => x.CurrentState);
+        modelBuilder.Entity<TestRequest>().OwnsMany("States", x => x.States);
         base.OnModelCreating(modelBuilder);
     }
 }

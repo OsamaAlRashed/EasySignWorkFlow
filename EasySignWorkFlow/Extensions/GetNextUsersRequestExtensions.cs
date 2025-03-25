@@ -24,6 +24,11 @@ public static class GetNextUsersRequestExtensions
         if (request.CurrentState is null)
             throw new CurrentStateNullException();
 
+        if (!flowMachine.Map.ContainsKey(request.CurrentState.Status))
+        {
+            return Enumerable.Empty<TKey>();
+        }
+
         foreach (var transaction in flowMachine.Map[request.CurrentState.Status])
         {
             if (await transaction.ValidAsync(request))

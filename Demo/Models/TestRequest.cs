@@ -10,6 +10,6 @@ public class TestRequest : IRequest<Guid, TestStatus>
     public string? Title { get; set; }
     public bool Flag { get; set; }
 
-    public List<State<Guid, TestStatus>> Statuses { get; } = [];
+    public List<State<Guid, TestStatus>> States { get; } = [];
     public State<Guid, TestStatus>? CurrentState { get; set; }
 }

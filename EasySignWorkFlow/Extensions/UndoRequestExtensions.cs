@@ -18,10 +18,10 @@ public static class UndoRequestExtensions
         if (request.CurrentState is null)
             throw new CurrentStateNullException();
 
-        if (request.Statuses.Count == 1)
+        if (request.States.Count == 1)
             throw new InvalidOperationException("The initial state cannot be undone.");
 
-        var lastState = request.Statuses[^1];
+        var lastState = request.States[^1];
 
         if (lastState.SignedBy is null || !lastState.SignedBy.Equals(undoBy))
         {
@@ -37,6 +37,6 @@ public static class UndoRequestExtensions
         return Result<TStatus>.SetSuccess(
             Enums.ActionType.Undo,
             lastState.Status,
-            request.Statuses[^1].Status);
+            request.States[^1].Status);
     }
 }
