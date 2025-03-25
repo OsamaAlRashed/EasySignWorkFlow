@@ -11,7 +11,7 @@ public class RequestUnitTests
     {
         var request = new MyRequest();
 
-        Assert.Empty(request.Statuses);
+        Assert.Empty(request.States);
         Assert.True(request.CurrentState is null);
     }
 
@@ -28,7 +28,7 @@ public class RequestUnitTests
         request.Add(newState);
         request.UpdateCurrentState(newState);
 
-        Assert.Single(request.Statuses);
+        Assert.Single(request.States);
         Assert.True(request.CurrentState is not null);
         Assert.True(request.CurrentState.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.Draft)));
         Assert.Equal(firstUserId, request.CurrentState.SignedBy);
@@ -57,7 +57,7 @@ public class RequestUnitTests
         request.Add(newState);
         request.UpdateCurrentState(newState);
 
-        Assert.Equal(2, request.Statuses.Count);
+        Assert.Equal(2, request.States.Count);
         Assert.Equal(MyRequestStatus.WaitingForManager1, request.CurrentState!.Status);
         Assert.True(request.CurrentState!.Equals(new State<Guid, MyRequestStatus>(MyRequestStatus.WaitingForManager1)));
         Assert.Equal(secondNote, request.CurrentState!.Note);

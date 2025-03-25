@@ -9,14 +9,14 @@ public class MyRequest : IRequest<Guid, MyRequestStatus>
     public string? Name { get; set; }
     public int Value { get; set; }
 
-    public List<State<Guid, MyRequestStatus>> Statuses { get; } = [];
+    public List<State<Guid, MyRequestStatus>> States { get; } = [];
     public State<Guid, MyRequestStatus>? CurrentState { get; set; }
 
-    internal void Add(State<Guid, MyRequestStatus> state) => Statuses.Add(state);
+    internal void Add(State<Guid, MyRequestStatus> state) => States.Add(state);
 
-    internal void Clear() => Statuses.Clear();
+    internal void Clear() => States.Clear();
 
-    internal void Remove(State<Guid, MyRequestStatus> state) => Statuses.Remove(state);
+    internal void Remove(State<Guid, MyRequestStatus> state) => States.Remove(state);
 
     internal virtual void UpdateCurrentState(State<Guid, MyRequestStatus> state)
     {
